@@ -1,10 +1,12 @@
 import sys
 from parser import parser
 from Interpreter import Interpreter
+from prompt_toolkit import prompt
+from prompt_toolkit.history import FileHistory
 
 def main():
     while True:
-        text = input("dbms> ")
+        text = prompt("dbms> ", history=FileHistory('.history.txt'),)
         if (text in ["exit", "quit", "\q"]):
             print("Bye")
             break
