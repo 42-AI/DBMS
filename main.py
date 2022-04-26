@@ -1,5 +1,5 @@
 import sys
-from parser import parser
+from parser import Parser
 from Interpreter import Interpreter
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
@@ -11,7 +11,7 @@ def main():
             print("Bye")
             break
         print(text)
-        parsingTree = parser(text)
+        parsingTree = Parser.parser(text)
         print("END RESULT:", parsingTree)
         Interpreter.execute(parsingTree)
 

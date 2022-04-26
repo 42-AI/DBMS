@@ -1,5 +1,6 @@
 import re
 import sys
+from parser_constants import keywords, precedences
 
 class ParsingNode:
     def __init__(self, keyword=None, name=None, lst=None, _next=None, previous=None):
@@ -37,14 +38,6 @@ class AstNode:
         else:
             return f"[{self.data}]"
 
-precedences = {}
-precedences.update(dict.fromkeys(['*', '/', '%'], 2))
-precedences.update(dict.fromkeys(['+', '-'], 3))
-precedences.update(dict.fromkeys(['=', '>', '<', '>=', '<=', '<>', '!=', '!>', '!<'], 4))
-precedences.update(dict.fromkeys(['NOT'], 5))
-precedences.update(dict.fromkeys(['AND'], 6))
-precedences.update(dict.fromkeys(['ALL', 'ANY', 'BETWEEN', 'IN', 'LIKE', 'OR', 'SOME'], 7))
-
 
 def has_greater_precedence(op1, op2):
     return precedences[op1] < precedences[op2]
@@ -64,80 +57,131 @@ def add_to_parsing_tree(parsingTree, keyword, lst):
         tmp.next = ParsingNode(keyword, lst, previous=tmp)
     return parsingTree
 
+class Parser:
+    @staticmethod 
+    def select_parser(input_tokens, keyword, name, lst):
+        while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
+            lst.append(input_tokens[0])
+            input_tokens = input_tokens[1:]
+        lst = ''.join(lst)
+        lst = ''.join(lst.split('('))
+        lst = ''.join(lst.split(')'))
+        lst = ''.join(lst.split('\''))
+        lst = lst.split(',')
+        return input_tokens, keyword, name, lst
 
-def parser(txt):
-    instructions = [
-        [e for e in re.split('([^_@$#a-zA-Z0-9])', inst) if e not in ' \n']
-        for inst in txt.upper().split(';') if inst != ''
-    ]
-    keywords = {
-        "SELECT": False,
-        "FROM": False,
-        "WHERE": False,
-        "CREATE": ["DATABASE", "TABLE"],
-        "DROP": ["DATABASE", "TABLE"],
-        "INSERT": ["INTO"],
-    }
-    parsingTree = None
-    for input_tokens in instructions:
-        while len(input_tokens) > 0:
-            # print("STEP", input_tokens[0] in keywords.keys(), input_tokens)
-            name = None
-            if input_tokens[0] in keywords.keys():
-                keyword = input_tokens[0]
-                input_tokens = input_tokens[1:]
-                if keyword in ["CREATE", "DROP", "INSERT"] and len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
-                    keyword += " " + input_tokens[0]
-                    name = input_tokens[1]
-                    input_tokens = input_tokens[2:]
-                elif keyword in ["USE"] and len(input_tokens) > 0:
-                    name = input_tokens[0]
-                    input_tokens = input_tokens[1:]
-                elif keyword in ["SHOW"] and len(input_tokens) > 0 and input_tokens[0] in keywords[keyword]:
-                    keyword += " " + input_tokens[0]
-                    input_tokens = input_tokens[1:]
-                elif keyword == "WHERE":
-                    operator_stack = []
-                    output_buffer = []
-                    input_tokens = input_tokens[1:]
-                    while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
-                        token = input_tokens[0]
-                        if token in precedences.keys():
-                            top = peek(operator_stack)
-                            while top is not None and top != '(' and not has_greater_precedence(token, top):
-                                y = operator_stack.pop()
-                                output_buffer.append(y)
-                                top = peek(operator_stack)
-                            operator_stack.append(token)
-                        elif token == '(':
-                            operator_stack.append(token)
-                        elif token == ')':
-                            top = peek(operator_stack)
-                            while top is not None and top != '(':
-                                output_buffer.append(operator_stack.pop())
-                                top = peek(operator_stack)
-                            if operator_stack[0] == '(':
-                                operator_stack.pop()
-                        else:
-                            output_buffer.append(token)
-                    while len(operator_stack) > 0:
-                        output_buffer.append(operator_stack.pop())
-                    print(output_buffer)
-                    parsingTree = add_to_parsing_tree(parsingTree, keyword, output_buffer)
+    @staticmethod 
+    def from_parser(input_tokens, keyword, name, lst):
+        while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
+            lst.append(input_tokens[0])
+            input_tokens = input_tokens[1:]
+        lst = ''.join(lst)
+        lst = ''.join(lst.split('('))
+        lst = ''.join(lst.split(')'))
+        lst = ''.join(lst.split('\''))
+        lst = lst.split(',')
+        return input_tokens, keyword, name, lst
 
-                else:
-                    lst = []
-                    while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
-                        lst.append(input_tokens[0])
-                        input_tokens = input_tokens[1:]
-                    lst = ''.join(lst)
-                    lst = ''.join(lst.split('('))
-                    lst = ''.join(lst.split(')'))
-                    lst = ''.join(lst.split('\''))
-                    lst = lst.split(',')
-                    parsingTree = add_to_parsing_tree(parsingTree, keyword, lst)
+    @staticmethod 
+    def where_parser(input_tokens, keyword, name, lst):
+        operator_stack = []
+        output_buffer = []
+        input_tokens = input_tokens[1:]
+        while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
+            token = input_tokens[0]
+            if token in precedences.keys():
+                top = peek(operator_stack)
+                while top is not None and top != '(' and not has_greater_precedence(token, top):
+                    y = operator_stack.pop()
+                    output_buffer.append(y)
+                    top = peek(operator_stack)
+                operator_stack.append(token)
+            elif token == '(':
+                operator_stack.append(token)
+            elif token == ')':
+                top = peek(operator_stack)
+                while top is not None and top != '(':
+                    output_buffer.append(operator_stack.pop())
+                    top = peek(operator_stack)
+                if operator_stack[0] == '(':
+                    operator_stack.pop()
             else:
-                print("parsing error", file=sys.stderr)
-                return
-        return parsingTree
+                output_buffer.append(token)
+        while len(operator_stack) > 0:
+            output_buffer.append(operator_stack.pop())
+        # print(output_buffer)
+        lst = output_buffer
+        return input_tokens, keyword, name, lst
+
+    @staticmethod 
+    def create_parser(input_tokens, keyword, name, lst):
+        if len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
+            keyword += " " + input_tokens[0]
+            name = input_tokens[1]
+            input_tokens = input_tokens[2:]
+        print("NAME:", name)
+        return input_tokens, keyword, name, lst
+
+    @staticmethod 
+    def drop_parser(input_tokens, keyword, name, lst):
+        if len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
+            keyword += " " + input_tokens[0]
+            name = input_tokens[1]
+            input_tokens = input_tokens[2:]
+        print("NAME:", name)
+        return input_tokens, keyword, name, lst
+
+    @staticmethod 
+    def insert_parser(input_tokens, keyword, name, lst):
+        if len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
+            keyword += " " + input_tokens[0]
+            name = input_tokens[1]
+            input_tokens = input_tokens[2:]
+        print("NAME:", name)
+        return input_tokens, keyword, name, lst
+
+    @staticmethod
+    def use_parser(input_tokens, keyword, name, lst):
+        if len(input_tokens) > 0:
+            name = input_tokens[0]
+            input_tokens = input_tokens[1:]
+        return input_tokens, keyword, name, lst
+
+    @staticmethod
+    def show_parser(input_tokens, keyword, name, lst):
+        if len(input_tokens) > 0 and input_tokens[0] in keywords[keyword]:
+            keyword += " " + input_tokens[0]
+            input_tokens = input_tokens[1:]
+        return input_tokens, keyword, name, lst
+
+    @staticmethod
+    def parser(txt):
+        instructions = [
+            [e for e in re.split('([^_@$#a-zA-Z0-9])', inst) if e not in ' \n']
+            for inst in txt.upper().split(';') if inst != ''
+        ]
+        dic = {
+            "SELECT": lambda input_tokens, keyword, name, lst: select_parser(input_tokens, keyword, name, lst),
+            "FROM": lambda input_tokens, keyword, name, lst: from_parser(input_tokens, keyword, name, lst),
+            "WHERE": lambda input_tokens, keyword, name, lst: where_parser(input_tokens, keyword, name, lst),
+            "CREATE": lambda input_tokens, keyword, name, lst: create_parser(input_tokens, keyword, name, lst),
+            "DROP": lambda input_tokens, keyword, name, lst: drop_parser(input_tokens, keyword, name, lst),
+            "INSERT": lambda input_tokens, keyword, name, lst: insert_parser(input_tokens, keyword, name, lst),
+            "USE": lambda input_tokens, keyword, name, lst: use_parser(input_tokens, keyword, name, lst),
+            "SHOW": lambda input_tokens, keyword, name, lst: show_parser(input_tokens, keyword, name, lst),
+        }
+        parsingTree = None
+        for input_tokens in instructions:
+            while len(input_tokens) > 0:
+                # print("STEP", input_tokens[0] in keywords.keys(), input_tokens)
+                name = None
+                lst = []
+                if input_tokens[0] in keywords.keys():
+                    keyword, input_tokens = input_tokens[0], input_tokens[1:]
+                    input_tokens, keyword, name, lst = dic[keyword](input_tokens, keyword, name, lst)
+                    parsingTree = add_to_parsing_tree(parsingTree, keyword, lst)
+                else:
+                    print("parsing error", file=sys.stderr)
+                    return
+            return parsingTree
 
