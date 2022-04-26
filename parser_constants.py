@@ -7,10 +7,10 @@ precedences.update(dict.fromkeys(['AND'], 6))
 precedences.update(dict.fromkeys(['ALL', 'ANY', 'BETWEEN', 'IN', 'LIKE', 'OR', 'SOME'], 7))
 
 keywords = {
-        "SELECT": False,
-        "FROM": False,
-        "WHERE": False,
-        "CREATE": ["DATABASE", "TABLE"],
-        "DROP": ["DATABASE", "TABLE"],
-        "INSERT": ["INTO"],
-    }
+    "SELECT": False,
+    "FROM": False,
+    "WHERE": False,
+    "CREATE": ["DATABASE", "TABLE"],
+    "DROP": ["DATABASE", "TABLE"],
+    "INSERT": ["INTO"],
+}
