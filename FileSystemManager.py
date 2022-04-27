@@ -1,5 +1,5 @@
 from pathlib import Path
-import os
+import os, sys
 import os.path as path
 _MAIN_PATH_NAME = ".dbms"
 _MAIN_PATH = path.join(os.getcwd(), _MAIN_PATH_NAME)
