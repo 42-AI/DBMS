@@ -102,6 +102,15 @@ class Parser:
             name = input_tokens[1]
             input_tokens = input_tokens[2:]
         print("NAME:", name)
+        if keyword == "CREATE TABLE":
+            while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
+                lst.append(input_tokens[0])
+                input_tokens = input_tokens[1:]
+            lst = ''.join(lst)
+            lst = ''.join(lst.split('('))
+            lst = ''.join(lst.split(')'))
+            lst = ''.join(lst.split('\''))
+            lst = lst.split(',')
         return (input_tokens, keyword, name, lst)
 
     @staticmethod 
