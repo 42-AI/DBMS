@@ -13,4 +13,6 @@ keywords = {
     "CREATE": ["DATABASE", "TABLE"],
     "DROP": ["DATABASE", "TABLE"],
     "INSERT": ["INTO"],
+    "USE": False,
+    "SHOW": False
 }
