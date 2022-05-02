@@ -14,5 +14,5 @@ keywords = {
     "DROP": ["DATABASE", "TABLE"],
     "INSERT": ["INTO"],
     "USE": False,
-    "SHOW": False
+    "SHOW": ["DATABASES", "TABLES"],
 }
