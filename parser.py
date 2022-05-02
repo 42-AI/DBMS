@@ -91,7 +91,6 @@ class Parser:
                 output_buffer.append(token)
         while len(operator_stack) > 0:
             output_buffer.append(operator_stack.pop())
-        # print(output_buffer)
         lst = output_buffer
         return (input_tokens, keyword, name, lst)
 
@@ -101,7 +100,6 @@ class Parser:
             keyword += " " + input_tokens[0]
             name = input_tokens[1]
             input_tokens = input_tokens[2:]
-        print("NAME:", name)
         if keyword == "CREATE TABLE":
             while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
                 lst.append(input_tokens[0])
@@ -128,7 +126,6 @@ class Parser:
             keyword += " " + input_tokens[0]
             name = input_tokens[1]
             input_tokens = input_tokens[2:]
-        print("NAME:", name)
         return (input_tokens, keyword, name, lst)
 
     @staticmethod
@@ -152,14 +149,13 @@ class Parser:
         parsingTree = None
         for input_tokens in instructions:
             while len(input_tokens) > 0:
-                # print("STEP", input_tokens[0] in keywords.keys(), input_tokens)
                 name = None
                 lst = []
                 if input_tokens[0] in keywords.keys():
                     keyword, input_tokens = input_tokens[0], input_tokens[1:]
-                    print("BEFORE:", input_tokens, keyword, name, lst) 
+                    # print("BEFORE:", input_tokens, keyword, name, lst) 
                     (input_tokens, keyword, name, lst) = Parser.keyword_functions[keyword](input_tokens, keyword, name, lst)
-                    print("AFTER:", input_tokens, keyword, name, lst, "\n===========================") 
+                    # print("AFTER:", input_tokens, keyword, name, lst, "\n===========================") 
                     parsingTree = add_to_parsing_tree(parsingTree, keyword, name, lst)
                 else:
                     print("parsing error", file=sys.stderr)
