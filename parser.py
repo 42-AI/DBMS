@@ -2,7 +2,6 @@ import re
 import sys
 from parser_constants import keywords, precedences
 from ParsingNode import ParsingNode
-from AstNode import AstNode
 
 
 def has_greater_precedence(op1, op2):
@@ -145,6 +144,7 @@ class Parser:
     @staticmethod
     def parser(txt):
         instructions = Parser.get_input_tokens_list(txt)
+        print("INSTRUCTIONS:", instructions)
         print(instructions)
         parsingTree = None
         for input_tokens in instructions:
