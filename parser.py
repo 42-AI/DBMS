@@ -1,14 +1,16 @@
 import re
 import sys
-from parser_constants import keywords, precedences
+from parser_constants import keywords, precedences, keywords_list, datatypes
 from ParsingNode import ParsingNode
 
 
 def has_greater_precedence(op1, op2):
     return precedences[op1] < precedences[op2]
 
+
 def peek(stack):
     return stack[-1] if stack else None
+
 
 def add_to_parsing_tree(parsingTree, keyword, name, lst):
     if parsingTree is None:
@@ -17,8 +19,10 @@ def add_to_parsing_tree(parsingTree, keyword, name, lst):
         tmp = parsingTree
         while tmp.next is not None:
             tmp = tmp.next
-        tmp.next = ParsingNode(keyword=keyword, name=name, lst=lst, previous=tmp)
+        tmp.next = ParsingNode(
+            keyword=keyword, name=name, lst=lst, previous=tmp)
     return parsingTree
+
 
 class Parser:
     keyword_functions = {
@@ -31,14 +35,33 @@ class Parser:
         "USE": lambda input_tokens, keyword, name, lst: Parser.use_parser(input_tokens, keyword, name, lst),
         "SHOW": lambda input_tokens, keyword, name, lst: Parser.show_parser(input_tokens, keyword, name, lst),
     }
+
     @staticmethod
     def get_input_tokens_list(txt):
-        return [
-            [e for e in re.split('("[ !#-&(-~]*"|\'[ !#-&(-~]*\'|[^_@$#a-zA-Z0-9])', inst) if e not in ' \n']
+        tmp = [
+            [e for e in re.split(
+                '("[ !#-&(-~]*"|\'[ !#-&(-~]*\'|[^_@$#a-zA-Z0-9])', inst) if e not in ' \n']
             for inst in txt.upper().split(';') if inst != ''
         ]
+        instructions = []
+        for line in tmp:
+            tokens = []
+            for elem in line:
+                if elem in keywords_list:
+                    elem_type = "keyword"
+                elif elem in precedences.keys():
+                    elem_type = "operator"
+                elif len(elem) == 1 and elem[0] in "()[]\{\}\t\n\r ,":
+                    elem_type = "separator"
+                elif elem in datatypes:
+                    elem_type = "datatype"
+                else:
+                    elem_type = "variable"
+                tokens.append([elem_type, elem])
+            instructions.append(tokens)
+        return instructions
 
-    @staticmethod 
+    @staticmethod
     def select_parser(input_tokens, keyword, name, lst):
         while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
             lst.append(input_tokens[0])
@@ -50,7 +73,7 @@ class Parser:
         lst = lst.split(',')
         return (input_tokens, keyword, name, lst)
 
-    @staticmethod 
+    @staticmethod
     def from_parser(input_tokens, keyword, name, lst):
         while len(input_tokens) > 0 and input_tokens[0] not in keywords.keys():
             lst.append(input_tokens[0])
@@ -62,7 +85,7 @@ class Parser:
         lst = lst.split(',')
         return (input_tokens, keyword, name, lst)
 
-    @staticmethod 
+    @staticmethod
     def where_parser(input_tokens, keyword, name, lst):
         operator_stack = []
         output_buffer = []
@@ -93,7 +116,7 @@ class Parser:
         lst = output_buffer
         return (input_tokens, keyword, name, lst)
 
-    @staticmethod 
+    @staticmethod
     def create_parser(input_tokens, keyword, name, lst):
         if len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
             keyword += " " + input_tokens[0]
@@ -110,7 +133,7 @@ class Parser:
             lst = lst.split(',')
         return (input_tokens, keyword, name, lst)
 
-    @staticmethod 
+    @staticmethod
     def drop_parser(input_tokens, keyword, name, lst):
         if len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
             keyword += " " + input_tokens[0]
@@ -119,7 +142,7 @@ class Parser:
         print("NAME:", name)
         return (input_tokens, keyword, name, lst)
 
-    @staticmethod 
+    @staticmethod
     def insert_parser(input_tokens, keyword, name, lst):
         if len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
             keyword += " " + input_tokens[0]
@@ -145,18 +168,20 @@ class Parser:
     def parser(txt):
         instructions = Parser.get_input_tokens_list(txt)
         print("INSTRUCTIONS:", instructions)
-        print(instructions)
         parsingTree = None
         for input_tokens in instructions:
             while len(input_tokens) > 0:
                 name = None
                 lst = []
-                if input_tokens[0] in keywords.keys():
-                    keyword, input_tokens = input_tokens[0], input_tokens[1:]
-                    # print("BEFORE:", input_tokens, keyword, name, lst) 
-                    (input_tokens, keyword, name, lst) = Parser.keyword_functions[keyword](input_tokens, keyword, name, lst)
-                    # print("AFTER:", input_tokens, keyword, name, lst, "\n===========================") 
-                    parsingTree = add_to_parsing_tree(parsingTree, keyword, name, lst)
+                print(input_tokens)
+                if input_tokens[0][0] == "keyword":
+                    keyword, input_tokens = input_tokens[0][1], input_tokens[1:]
+                    # print("BEFORE:", input_tokens, keyword, name, lst)
+                    (input_tokens, keyword, name, lst) = Parser.keyword_functions[keyword](
+                        input_tokens, keyword, name, lst)
+                    # print("AFTER:", input_tokens, keyword, name, lst, "\n===========================")
+                    parsingTree = add_to_parsing_tree(
+                        parsingTree, keyword, name, lst)
                 else:
                     print("parsing error", file=sys.stderr)
                     return

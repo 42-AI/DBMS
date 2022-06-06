@@ -1,40 +1,67 @@
 class Node:
-    def __init__(self):
-        pass
-
-
-class keywordNode(Node):
     def __init__(self, keyword=None):
         self.keyword = keyword
 
-class SelectStatementNode(keywordNode):
-    def __init__(self, selectClause=None, fromClause=None, whereClause=None, orderByClause=None):
-        self.keyword = "SELECT"
-        self.selectClause = selectClause
-        self.fromClause = fromClause
-        self.whereClause = whereClause
-        self.orderByClause = orderByClause
+class CreateTableStatement(Node):
+    # columns == list of {name: "", type: "", null?: False, default?: None } objects
+    def __init__(self, keyword=None, tableName=None, columns=[]):
+        super().__init__(keyword)
+        self.tableName = tableName
+        self.columns = ""
 
-class InsertStatementNode(keywordNode):
-    def __init__(self, table=None, columns=[], values=[]):
-        self.keyword = "INSERT"
-        self.table = table
-        self.columns = columns
-        self.values = values
+# class SelectStatementNode(keywordNode):
+#     def __init__(self, selectClause=None, fromClause=None, whereClause=None, orderByClause=None):
+#         self.keyword = "SELECT"
+#         self.selectClause = selectClause
+#         self.fromClause = fromClause
+#         self.whereClause = whereClause
+#         self.orderByClause = orderByClause
 
-class UpdateStatement(keywordNode):
-    def __init__(self, table=None, setClause=None, whereClause=None):
-        self.keyword = "UPDATE"
-        self.table = table
-        self.setClause = setClause
-        self.whereClause = whereClause
+# class SelectClauseNode():
+#     def __init__(self, columnsList = []):
+#         self.columnsList = columnsList
+    # columnsList = { fullName: "", prefix: "", column: "", alias: ""}
 
-class DeleteStatement(keywordNode):
-    def __init__(self, table=None, setClause=None, whereClause=None):
-        self.keyword = "DELETE"
-        self.table = table
-        self.setClause = setClause
-        self.whereClause = whereClause
+
+# class InsertStatementNode(keywordNode):
+#     def __init__(self, table=None, columns=[], values=[]):
+#         self.keyword = "INSERT"
+#         self.table = table
+#         self.columns = columns
+#         self.values = values
+
+# class UpdateStatement(keywordNode):
+#     def __init__(self, table=None, setClause=None, whereClause=None):
+#         self.keyword = "UPDATE"
+#         self.table = table
+#         self.setClause = setClause
+#         self.whereClause = whereClause
+
+# class DeleteStatement(keywordNode):
+#     def __init__(self, table=None, setClause=None, whereClause=None):
+#         self.keyword = "DELETE"
+#         self.table = table
+#         self.setClause = setClause
+#         self.whereClause = whereClause
+
+# class TreeNode():
+#     keyword: str
+#     children: List[TreeNode] = []
+
+# class keyword(TreeNode, keyword, input):
+    # get_children("select", input)
+
+    # obj:
+    #       name = SELECT / CREATE TABLE / CREATE DATABASE / SHOW DATABASE / WHERE...
+    #       type = keyword / operator / variable / separator
+    #       statment = "*" / list of objects 
+            # self.next = {
+            #     'FROM': None,
+            #     'WHERE': None,
+            #     'VALUES': None,
+            # }
+    #       self.FROM = obj
+    #       self.WHERE = NONE
 
 
 class OperatorNode(Node):

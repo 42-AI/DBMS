@@ -1,0 +1,12 @@
+create table new_employees
+(
+	employee_id  int,
+	first_name  varchar(15) null,
+	last_name varchar(15),
+    age datetime,
+	hire_date date default sysdate,
+	created_at timestamp,
+	updated_at timestamp,
+	deleted_at timestamp
+);
+
