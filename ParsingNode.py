@@ -1,15 +1,28 @@
+# for:
+#  - SHOW (DATABASES OR TABLES)
 class Node:
-    def __init__(self, keyword=None):
+    def __init__(self, keyword=None, db_name=None, _next=None, previous=None):
         self.keyword = keyword
+        self.db_name = db_name
+        self.next = _next
+        self.previous = previous
 
-class CreateTableStatement(Node):
-    # columns == list of {name: "", type: "", null?: False, default?: None } objects
-    def __init__(self, keyword=None, tableName=None, columns=[]):
-        super().__init__(keyword)
-        self.tableName = tableName
-        self.columns = ""
+    def __str__(self):
+        ret = ""
+        if self.keyword:
+            ret += f"{self.keyword} "
+        if self.next:
+            ret += f"{self.next.__str__()} "
+        return ret
 
-# class SelectStatementNode(keywordNode):
+# class CreateTableStatement(Node):
+#     # columns == list of {name: "", type: "", null?: False, default?: None } objects
+#     def __init__(self, keyword=None, tableName=None, columns=[]):
+#         super().__init__(keyword)
+#         self.tableName = tableName
+#         self.columns = ""
+
+# class SelectStatementNode(Node):
 #     def __init__(self, selectClause=None, fromClause=None, whereClause=None, orderByClause=None):
 #         self.keyword = "SELECT"
 #         self.selectClause = selectClause
@@ -23,21 +36,21 @@ class CreateTableStatement(Node):
     # columnsList = { fullName: "", prefix: "", column: "", alias: ""}
 
 
-# class InsertStatementNode(keywordNode):
+# class InsertStatementNode(Node):
 #     def __init__(self, table=None, columns=[], values=[]):
 #         self.keyword = "INSERT"
 #         self.table = table
 #         self.columns = columns
 #         self.values = values
 
-# class UpdateStatement(keywordNode):
+# class UpdateStatement(Node):
 #     def __init__(self, table=None, setClause=None, whereClause=None):
 #         self.keyword = "UPDATE"
 #         self.table = table
 #         self.setClause = setClause
 #         self.whereClause = whereClause
 
-# class DeleteStatement(keywordNode):
+# class DeleteStatement(Node):
 #     def __init__(self, table=None, setClause=None, whereClause=None):
 #         self.keyword = "DELETE"
 #         self.table = table
@@ -64,31 +77,31 @@ class CreateTableStatement(Node):
     #       self.WHERE = NONE
 
 
-class OperatorNode(Node):
-    def __init__(self, operator=None):
-        self.operator = operator
+# class OperatorNode(Node):
+#     def __init__(self, operator=None):
+#         self.operator = operator
 
-class VariableNode(Node):
-    def __init__(self, variable=None):
-        self.variable = variable
+# class VariableNode(Node):
+#     def __init__(self, variable=None):
+#         self.variable = variable
         
 
-class ParsingNode:
-    def __init__(self, keyword=None, name=None, lst=None, _next=None, previous=None):
-        self.keyword = keyword
-        self.name = name
-        self.lst = lst
-        self.next = _next
-        self.previous = previous
+# class ParsingNode:
+#     def __init__(self, keyword=None, name=None, lst=None, _next=[], previous=None):
+#         self.keyword = keyword
+#         self.name = name
+#         self.lst = lst
+#         self.next = _next
+#         self.previous = previous
 
-    def __str__(self):
-        ret = ""
-        if self.keyword:
-            ret += f"{self.keyword} "
-        if self.name:
-            ret += f"<{self.name}> "
-        if self.lst:
-            ret += f"{self.lst} "
-        if self.next:
-            ret += f"{self.next.__str__()} "
-        return ret
+#     def __str__(self):
+#         ret = ""
+#         if self.keyword:
+#             ret += f"{self.keyword} "
+#         if self.name:
+#             ret += f"<{self.name}> "
+#         if self.lst:
+#             ret += f"{self.lst} "
+#         if self.next:
+#             ret += f"{self.next.__str__()} "
+#         return ret

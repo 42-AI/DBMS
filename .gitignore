@@ -1,3 +1,4 @@
 .dbms/
 __pycache__/
 .history.txt
+.buffer_hist.txt

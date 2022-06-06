@@ -11,8 +11,8 @@ keywords = {
     "FROM": None,
     "WHERE": None,
     "CREATE": ["DATABASE", "TABLE"],
-    "DROP": ["DATABASE", "TABLE"],
     "INSERT": ["INTO"],
+    "DROP": ["DATABASE", "TABLE"],
     "USE": None,
     "SHOW": ["DATABASES", "TABLES"],
 }
