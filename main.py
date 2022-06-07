@@ -12,7 +12,7 @@ def main():
             print("Bye")
             break
         parsingTree = Parser.parser(commande)
-        print("END RESULT:", parsingTree)
+        # print("END RESULT:", parsingTree)
         Interpreter.execute(parsingTree)
 
 
