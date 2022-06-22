@@ -15,12 +15,12 @@ class Node:
             ret += f"{self.next.__str__()} "
         return ret
 
-# class CreateTableStatement(Node):
-#     # columns == list of {name: "", type: "", null?: False, default?: None } objects
-#     def __init__(self, keyword=None, tableName=None, columns=[]):
-#         super().__init__(keyword)
-#         self.tableName = tableName
-#         self.columns = ""
+class CreateTableStatementNode(Node):
+    # columns == list of {name: "", type: "", null?: False, default?: None } objects
+    def __init__(self, keyword=None, db_name=None, tableName=None, columns=[]):
+        super().__init__(keyword)
+        self.tableName = tableName
+        self.columns = ""
 
 # class SelectStatementNode(Node):
 #     def __init__(self, selectClause=None, fromClause=None, whereClause=None, orderByClause=None):

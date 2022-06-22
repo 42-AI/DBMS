@@ -2,7 +2,7 @@ from pathlib import Path
 import os, sys
 import os.path as path
 import shutil
-from textColor import bcolors
+from utils import colors
 _MAIN_PATH_NAME = ".dbms"
 _MAIN_PATH = path.join(os.getcwd(), _MAIN_PATH_NAME)
 
@@ -83,7 +83,7 @@ class FileSystemManager:
     def get_dbs():
         dir_list = os.listdir(os.getcwd())
         if _MAIN_PATH_NAME not in dir_list:
-            print(f"{bcolors.BOLD}Empty set{bcolors.ENDC}")
+            print(f"{colors.BOLD}Empty set{colors.ENDC}")
             return
         elements = os.listdir(_MAIN_PATH)
         dbs = []
@@ -96,7 +96,7 @@ class FileSystemManager:
     def get_tables(db_name):
         dir_list = os.listdir(os.getcwd())
         if _MAIN_PATH_NAME not in dir_list:
-            print(f"{bcolors.BOLD}Empty set{bcolors.ENDC}")
+            print(f"{colors.BOLD}Empty set{colors.ENDC}")
             return
         return os.listdir(FileSystemManager._get_dir_fullPath(db_name))
         
