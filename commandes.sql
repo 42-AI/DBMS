@@ -8,6 +8,7 @@ CREATE TABLE customers (
     name varchar(255),
     age int
 );
+
 -- Types:
 -- char(n)
 -- varchar(n)
