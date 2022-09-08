@@ -3,7 +3,6 @@ from Interpreter import Interpreter
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.application import run_in_terminal
 from datetime import datetime
 
 bindings = KeyBindings()
@@ -12,7 +11,7 @@ bindings = KeyBindings()
 @bindings.add('c-c')
 @bindings.add('c-d')
 def _(event):
-    event.app.exit()
+    exit(0)
 
 def writeInHistory(text):
     with open('.history.txt', 'a') as f:
