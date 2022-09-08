@@ -14,12 +14,12 @@ CREATE TABLE customers (
 -- varchar(n)
 -- integer
 -- real (6 chiffre de precision)
--- serial (auto increment==> pour les id/primary key)
 
 -- Keywords:
 -- PRIMARY KEY
 -- NOT NULL
 -- NULL
+-- AUTO_INCREMENT => equivalent of SERIAL in postgreSQL
 -- LIMIT 10
 
 DROP TABLE db_name;
