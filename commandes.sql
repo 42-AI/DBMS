@@ -10,10 +10,10 @@ CREATE TABLE customers (
 );
 
 -- Types:
--- char(n)
--- varchar(n)
--- integer
--- real (6 chiffre de precision)
+-- char(n) => 255
+-- varchar(n) => 255
+-- integer => 10
+-- real (6 chiffre de precision) => 37
 
 -- Keywords:
 -- PRIMARY KEY
