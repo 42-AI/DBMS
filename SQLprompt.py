@@ -2,7 +2,17 @@ from parser import Parser
 from Interpreter import Interpreter
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.application import run_in_terminal
 from datetime import datetime
+
+bindings = KeyBindings()
+
+
+@bindings.add('c-c')
+@bindings.add('c-d')
+def _(event):
+    event.app.exit()
 
 def writeInHistory(text):
     with open('.history.txt', 'a') as f:
@@ -12,7 +22,9 @@ def writeInHistory(text):
 def multiLinePrompt(text):
     buffer = str(text)
     while not buffer.endswith(";"):
-        text = prompt("  -> ", history=FileHistory('.buffer_hist.txt'), )
+        text = prompt("  -> ", history=FileHistory('.buffer_hist.txt'), key_bindings=bindings)
+        if not (type(text) is str):
+            return ("exit")
         if not str.isspace(text) and len(text) > 0:
             buffer += " " + text.strip(" ")
     writeInHistory(buffer)
@@ -23,8 +35,9 @@ def parsText(text):
     Interpreter.execute(parsingTree)
 
 def SQLprompt():
-    text = prompt("dbms> ", history=FileHistory('.history.txt'), )
-    if (text in ["exit", "quit", "\q"]) or str(text).lower().startswith("use"):
+    text = prompt("dbms> ", history=FileHistory('.history.txt'), key_bindings=bindings)
+    # print(type(text))
+    if not (type(text) is str) or (text in ["exit", "quit", "\q"]):
         return text
     else:
         return multiLinePrompt(text)
