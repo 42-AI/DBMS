@@ -1,9 +1,9 @@
 # for:
 #  - SHOW (DATABASES OR TABLES)
 class Node:
-    def __init__(self, keyword=None, db_name=None, _next=None, previous=None):
+    def __init__(self, keyword=None, data=None, _next=None, previous=None):
         self.keyword = keyword
-        self.db_name = db_name
+        self.data = data
         self.next = _next
         self.previous = previous
 
