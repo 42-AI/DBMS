@@ -16,11 +16,11 @@ def ctrlC_handler(signal, frame):
 def main():
     # signal.signal(signal.SIGINT, ctrlC_handler)
     while True:
-        commande = SQLprompt()
-        if (commande in ["exit", "quit", "\q", "exit;", "quit;", "\q;"]) or prompt_toolkit.keys.Keys.ControlC:
+        command = SQLprompt()
+        if (command in ["exit", "quit", "\q", "exit;", "quit;", "\q;"]) or prompt_toolkit.keys.Keys.ControlC:
             print("Bye")
             break
-        parsingTree = Parser.parser(commande)
+        parsingTree = Parser.parser(command)
         # print("END RESULT:", parsingTree)
         Interpreter.execute(parsingTree)
 
