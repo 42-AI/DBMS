@@ -20,14 +20,14 @@ data = {
             "FIELD": "customer_id",
              "TYPE" : "int",
              "LENGTH": 11,
-             "ALLOW NULL": False, # ==> NOT NULL
+             "NULL": False, # ==> NOT NULL
              "KEY": "PRIMARY",
              "DEFAULT": "",
              "EXTRA": "AUTO_INCREMENT",
              "COMMENT": "This is a random comment"
          },
         {
-            "FIELD", "first_name",
+            "FIELD_NAME", "first_name",
             "TYPE" , "char",
             "LENGTH", 32,
             "ALLOW NULL", False, # ==> NOT NULL
@@ -37,7 +37,7 @@ data = {
             "COMMENT", ""
         },
         {
-            "FIELD", "last_name",
+            "FIELD_NAME", "last_name",
             "TYPE" , "char",
             "LENGTH", 32,
             "ALLOW NULL", True, # ==> NULL ALLOWED
@@ -47,7 +47,7 @@ data = {
             "COMMENT", ""
         },
         {
-            "FIELD", "status" ,
+            "FIELD_NAME", "status" ,
             "TYPE" , "int" ,
             "LENGTH", 11 ,
             "ALLOW NULL", True, # ==> NULL ALLOWED
@@ -57,7 +57,7 @@ data = {
             "COMMENT", ""
         },
         {
-            "FIELD", "status",
+            "FIELD_NAME", "status",
             "TYPE" , "int",
             "LENGTH", 11,
             "ALLOW NULL", True, # ==> NULL ALLOWED
