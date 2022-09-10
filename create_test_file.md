@@ -14,60 +14,58 @@ new node:
 ```python
 keyword = "CREATE TABLE",
 data = {
-    "NAME": "customers",
-    "DESCRIPTION": [
-        {
-            "FIELD": "customer_id",
-             "TYPE" : "int",
-             "LENGTH": 11,
-             "NULL": False, # ==> NOT NULL
-             "KEY": "PRIMARY",
-             "DEFAULT": "",
-             "EXTRA": "AUTO_INCREMENT",
-             "COMMENT": "This is a random comment"
-         },
-        {
-            "FIELD_NAME", "first_name",
-            "TYPE" , "char",
-            "LENGTH", 32,
-            "ALLOW NULL", False, # ==> NOT NULL
-            "KEY", None,
-            "DEFAULT", "",
-            "EXTRA", None,
-            "COMMENT", ""
-        },
-        {
-            "FIELD_NAME", "last_name",
-            "TYPE" , "char",
-            "LENGTH", 32,
-            "ALLOW NULL", True, # ==> NULL ALLOWED
-            "KEY", None,
-            "DEFAULT", "",
-            "EXTRA", None,
-            "COMMENT", ""
-        },
-        {
-            "FIELD_NAME", "status" ,
-            "TYPE" , "int" ,
-            "LENGTH", 11 ,
-            "ALLOW NULL", True, # ==> NULL ALLOWED
-            "KEY", None,
-            "DEFAULT", "1",
-            "EXTRA", None,
-            "COMMENT", ""
-        },
-        {
-            "FIELD_NAME", "status",
-            "TYPE" , "int",
-            "LENGTH", 11,
-            "ALLOW NULL", True, # ==> NULL ALLOWED
-            "KEY", None,
-            "DEFAULT", "1",
-            "EXTRA", None,
-            "COMMENT", ""
-            
-        }
-        
-    ]
+	'NAME': 'CUSTOMERS',
+	'DESCRIPTION': [
+		{
+			'FIELD': 'CUSTOMER_ID',
+			'TYPE': 'INT',
+			'LENGTH': 11,
+			'NULL': True,
+			'KEY': '',
+			'DEFAULT': '',
+			'EXTRA': 'AUTO_INCREMENT',
+			'COMMENT': '"THIS IS A RANDOM COMMENT"'
+		},
+		{
+			'FIELD': 'FIRST_NAME',
+			'TYPE': 'CHAR',
+			'LENGTH': '32',
+			'NULL': False,
+			'KEY': '',
+			'DEFAULT': '',
+			'EXTRA': '',
+			'COMMENT': ''
+		},
+		{
+			'FIELD': 'LAST_NAME',
+			'TYPE': 'CHAR',
+			'LENGTH': '32',
+			'NULL': True,
+			'KEY': '',
+			'DEFAULT': '',
+			'EXTRA': '',
+			'COMMENT': ''
+		},
+		{
+			'FIELD': 'STATUS',
+			'TYPE': 'INT',
+			'LENGTH': 11,
+			'NULL': True,
+			'KEY': '',
+			'DEFAULT': '1',
+			'EXTRA': '',
+			'COMMENT': ''
+		},
+		{
+			'FIELD': 'COMMENT',
+			'TYPE': 'VARCHAR',
+			'LENGTH': '255',
+			'NULL': True,
+			'KEY': '',
+			'DEFAULT': '',
+			'EXTRA': '',
+			'COMMENT': ''
+		}
+	]
 }
 ```
