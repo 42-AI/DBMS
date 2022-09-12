@@ -4,14 +4,6 @@ from src.Parsing.Constants import precedences, keywords_list, data_types
 from src.Parsing.ParsingNode import Node
 
 
-def has_greater_precedence(op1, op2):
-    return precedences[op1] < precedences[op2]
-
-
-def peek(stack):
-    return stack[-1] if stack else None
-
-
 def add_to_parsing_tree(parsingTree, new_node):
     if parsingTree is None:
         parsingTree = new_node
@@ -31,7 +23,7 @@ class Parser:
         "CREATE TABLE": lambda input_tokens, keyword: Parser.create_table_parser(input_tokens, keyword),
         "DROP DATABASE": lambda input_tokens, keyword: Parser.drop_db_parser(input_tokens, keyword),
         "DROP TABLE": lambda input_tokens, keyword: Parser.drop_table_parser(input_tokens, keyword),
-        # "INSERT INTO": lambda input_tokens, keyword: Parser.insert_parser(input_tokens, keyword),
+        "INSERT INTO": lambda input_tokens, keyword: Parser.insert_parser(input_tokens, keyword),
         "CREATE DATABASE": lambda input_tokens, keyword: Parser.create_db_parser(input_tokens, keyword),
         "SHOW TABLES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
         "SHOW DATABASES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
@@ -43,19 +35,19 @@ class Parser:
         tmp = [
             [e for e in re.split(
                 '("[ !#-&(-~]*"|\'[ !#-&(-~]*\'|[^_@$#a-zA-Z0-9])', inst) if e not in ' \n']
-            for inst in txt.upper().split(';') if inst != ''
+            for inst in txt.split(';') if inst != ''
         ]
         instructions = []
         for line in tmp:
             tokens = []
             for elem in line:
-                if elem in keywords_list:
+                if elem.upper() in keywords_list:
                     elem_type = "keyword"
-                elif elem in precedences.keys():
+                elif elem.upper() in precedences.keys():
                     elem_type = "operator"
                 elif len(elem) == 1 and elem[0] in "()[]\{\}\t\n\r ,":
                     elem_type = "separator"
-                elif elem in data_types.keys():
+                elif elem.upper() in data_types.keys():
                     elem_type = "datatype"
                 else:
                     elem_type = "variable"
@@ -79,32 +71,32 @@ class Parser:
         description['FIELD'] = i_t[0][1]
         i_t = i_t[1:]
         while not (i_t[0][0] == "separator" and i_t[0][1] == ",") and len(i_t) > 1:
-            if i_t[0][0] == "datatype" and i_t[0][1] in data_types.keys():
-                description["TYPE"] = i_t[0][1]
+            if i_t[0][0] == "datatype" and i_t[0][1].upper() in data_types.keys():
+                description["TYPE"] = i_t[0][1].upper()
                 description["LENGTH"] = data_types[i_t[0][1]]
                 if len(i_t[1:]) > 3 and i_t[1][1] == "(" and i_t[3][1] == ")" and i_t[2][0] == "variable":
                     description["LENGTH"] = i_t[2][1]
                     i_t = i_t[3:]
             elif i_t[0][0] == "variable":
-                if i_t[0][1] == "AUTO_INCREMENT":
+                if i_t[0][1].upper() == "AUTO_INCREMENT":
                     description["EXTRA"] = i_t[0][1]
-                elif i_t[0][1] == "COMMENT" and len(i_t[1:]) > 2 and i_t[1][1] == '=' and i_t[2][0] == 'variable':
+                elif i_t[0][1].upper() == "COMMENT" and len(i_t[1:]) > 2 and i_t[1][1] == '=' and i_t[2][0] == 'variable':
                     c = i_t[2][1].split('"')
                     if (len(c) == 3):
                         description["COMMENT"] = c[1]
                     else:
                         return None, None
                     i_t = i_t[2:]
-                elif i_t[0][1] == "DEFAULT" and len(i_t) > 2 and i_t[1][0] == "variable":
+                elif i_t[0][1].upper() == "DEFAULT" and len(i_t) > 2 and i_t[1][0] == "variable":
                     description["DEFAULT"] = i_t[1][1]
                     i_t = i_t[1:]
-                elif i_t[0][1] == "PRIMARY" and len(i_t) > 2 and i_t[1][1] == "KEY":
+                elif i_t[0][1].upper() == "PRIMARY" and len(i_t) > 2 and i_t[1][1].upper() == "KEY":
                     description["KEY"] = 'PRI'
                     i_t = i_t[1:]
                 else:
                     print("ERROR WHILE FILLING DESCRIPTION")
                     return None, None
-            elif i_t[0][1] == "NOT" and len(i_t) > 2 and i_t[1][1] == "NULL":
+            elif i_t[0][1].upper() == "NOT" and len(i_t) > 2 and i_t[1][1].upper() == "NULL":
                 description["NULL"] = False
                 i_t = i_t[1:]
             i_t = i_t[1:]
@@ -147,6 +139,10 @@ class Parser:
         print(data)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         return input_tokens, Node(keyword=keyword, data=data)
+
+    @staticmethod
+    def insert_parser(input_token, keyword):
+        pass
 
     @staticmethod
     def simple_parser(input_tokens, keyword):
