@@ -29,13 +29,13 @@ class Parser:
         # "FROM": lambda input_tokens, keyword: Parser.from_parser(input_tokens, keyword),
         # "WHERE": lambda input_tokens, keyword: Parser.where_parser(input_tokens, keyword),
         "CREATE TABLE": lambda input_tokens, keyword: Parser.create_table_parser(input_tokens, keyword),
-        # "DROP DATABASE": lambda input_tokens, keyword: Parser.drop_parser(input_tokens, keyword),
-        # "DROP TABLE": lambda input_tokens, keyword: Parser.drop_parser(input_tokens, keyword),
+        "DROP DATABASE": lambda input_tokens, keyword: Parser.drop_db_parser(input_tokens, keyword),
+        "DROP TABLE": lambda input_tokens, keyword: Parser.drop_table_parser(input_tokens, keyword),
         # "INSERT INTO": lambda input_tokens, keyword: Parser.insert_parser(input_tokens, keyword),
-        "CREATE DATABASE": lambda input_tokens, keyword: Parser.use_create_database_parser(input_tokens, keyword),
+        "CREATE DATABASE": lambda input_tokens, keyword: Parser.create_db_parser(input_tokens, keyword),
         "SHOW TABLES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
         "SHOW DATABASES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
-        "USE": lambda input_tokens, keyword: Parser.use_create_database_parser(input_tokens, keyword),
+        "USE": lambda input_tokens, keyword: Parser.use_db_parser(input_tokens, keyword),
     }
 
     @staticmethod
@@ -214,12 +214,29 @@ class Parser:
         return input_tokens, Node(keyword=keyword, data=data)
 
     @staticmethod
-    def use_create_database_parser(input_tokens, keyword):
+    def simple_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
             return
         db_name = input_tokens[0][1]
         input_tokens = input_tokens[1:]
         return input_tokens, Node(keyword=keyword, data=db_name)
+
+    @staticmethod
+    def drop_table_parser(input_tokens, keyword):
+        return Parser.simple_parser(input_tokens, keyword)
+
+    @staticmethod
+    def drop_db_parser(input_tokens, keyword):
+        return Parser.simple_parser(input_tokens, keyword)
+
+    @staticmethod
+    def use_db_parser(input_tokens, keyword):
+        return Parser.simple_parser(input_tokens, keyword)
+
+    @staticmethod
+    def create_db_parser(input_tokens, keyword):
+        return Parser.simple_parser(input_tokens, keyword)
+        
 
     @staticmethod
     def show_parser(input_tokens, keyword):
