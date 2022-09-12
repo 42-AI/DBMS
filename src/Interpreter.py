@@ -12,9 +12,9 @@ class Interpreter:
     @staticmethod
     def execute(parsingTree):
         keyword_functions = {
-            "DROP DATABASE": lambda node: fsm.drop_db(node.name),
+            "DROP DATABASE": lambda node: fsm.drop_db(node.data),
             # "DROP TABLE": lambda node: fsm.drop_table_file(node.name, node.data),
-            # "CREATE TABLE": lambda node: fsm.create_table_file(node.name, node.data, node.lst),
+            "CREATE TABLE": lambda node: fsm.create_table_file(node.name, node.data, node.lst),
             "CREATE DATABASE": lambda node: fsm.create_db(node.data),
             "SHOW DATABASES": lambda node: Show.databases(),
             "SHOW TABLES": lambda node: Show.tables(node.data),
