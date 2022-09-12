@@ -1,5 +1,5 @@
-from parser import Parser
-from Interpreter import Interpreter
+from src.Parsing.Parser import Parser
+from src.Interpreter import Interpreter
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings

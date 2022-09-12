@@ -1,7 +1,7 @@
-from FileSystemManager import FileSystemManager as fsm
-from Show import Show
+from src.Server.FileSystemManager import FileSystemManager as fsm
+from src.Show import Show
 import sys
-from utils import colors
+from src.utils import colors
 
 
 class DatabaseName:
