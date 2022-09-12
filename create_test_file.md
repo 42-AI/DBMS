@@ -24,7 +24,7 @@ data = {
 			'KEY': '',
 			'DEFAULT': '',
 			'EXTRA': 'AUTO_INCREMENT',
-			'COMMENT': '"THIS IS A RANDOM COMMENT"'
+			'COMMENT': 'THIS IS A RANDOM COMMENT'
 		},
 		{
 			'FIELD': 'FIRST_NAME',
