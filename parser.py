@@ -1,6 +1,6 @@
 import re
 import sys
-from parser_constants import keywords, precedences, keywords_list, datatypes
+from parser_constants import precedences, keywords_list, data_types
 from ParsingNode import Node
 
 
@@ -28,7 +28,7 @@ class Parser:
         # "SELECT": lambda input_tokens, keyword: Parser.select_parser(input_tokens, keyword),
         # "FROM": lambda input_tokens, keyword: Parser.from_parser(input_tokens, keyword),
         # "WHERE": lambda input_tokens, keyword: Parser.where_parser(input_tokens, keyword),
-        # "CREATE TABLE": lambda input_tokens, keyword: Parser.create_parser(input_tokens, keyword),
+        "CREATE TABLE": lambda input_tokens, keyword: Parser.create_table_parser(input_tokens, keyword),
         # "DROP DATABASE": lambda input_tokens, keyword: Parser.drop_parser(input_tokens, keyword),
         # "DROP TABLE": lambda input_tokens, keyword: Parser.drop_parser(input_tokens, keyword),
         # "INSERT INTO": lambda input_tokens, keyword: Parser.insert_parser(input_tokens, keyword),
@@ -55,15 +55,16 @@ class Parser:
                     elem_type = "operator"
                 elif len(elem) == 1 and elem[0] in "()[]\{\}\t\n\r ,":
                     elem_type = "separator"
-                elif elem in datatypes:
+                elif elem in data_types.keys():
                     elem_type = "datatype"
                 else:
                     elem_type = "variable"
-                tokens.append([elem_type, elem])
+                if elem not in "\t\n\r":
+                    tokens.append([elem_type, elem])
             instructions.append(tokens)
         return instructions
 
-    @staticmethod
+    # @staticmethod
     # def select_parser(input_tokens, keyword):
     #     while len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
     #         lst.append(input_tokens[0][1])
@@ -74,8 +75,7 @@ class Parser:
     #     lst = ''.join(lst.split('\''))
     #     lst = lst.split(',')
     #     return (input_tokens, keyword)
-
-    @staticmethod
+    # @staticmethod
     # def from_parser(input_tokens, keyword):
     #     while len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
     #         lst.append(input_tokens[0][1])
@@ -86,8 +86,7 @@ class Parser:
     #     lst = ''.join(lst.split('\''))
     #     lst = lst.split(',')
     #     return (input_tokens, keyword)
-
-    @staticmethod
+    # @staticmethod
     # def where_parser(input_tokens, keyword):
     #     operator_stack = []
     #     output_buffer = []
@@ -117,8 +116,7 @@ class Parser:
     #         output_buffer.append(operator_stack.pop())
     #     lst = output_buffer
     #     return (input_tokens, keyword)
-
-    @staticmethod
+    # @staticmethod
     # def drop_parser(input_tokens, keyword):
     #     if len(input_tokens) > 1 and input_tokens[0][0] == "keyword":
     #         keyword += " " + input_tokens[0][1]
@@ -126,8 +124,7 @@ class Parser:
     #         input_tokens = input_tokens[2:]
     #     print("NAME:", name)
     #     return (input_tokens, keyword)
-
-    @staticmethod
+    # @staticmethod
     # def insert_parser(input_tokens, keyword):
     #     if len(input_tokens) > 1 and input_tokens[0] in keywords[keyword]:
     #         keyword += " " + input_tokens[0]
@@ -136,14 +133,85 @@ class Parser:
     #     return (input_tokens, keyword)
 
     @staticmethod
+    def fill_description(i_t, data):
+        description = {
+            "FIELD": "",
+            "TYPE": "",
+            "LENGTH": None,
+            "NULL": True,  # ==> NOT NULL
+            "KEY": "",
+            "DEFAULT": "",
+            "EXTRA": "",
+            "COMMENT": "",
+        }
+        description['FIELD'] = i_t[0][1]
+        i_t = i_t[1:]
+        while not (i_t[0][0] == "separator" and i_t[0][1] == ",") and len(i_t) > 1:
+            if i_t[0][0] == "datatype" and i_t[0][1] in data_types.keys():
+                description["TYPE"] = i_t[0][1]
+                description["LENGTH"] = data_types[i_t[0][1]]
+                if len(i_t[1:]) > 3 and i_t[1][1] == "(" and i_t[3][1] == ")" and i_t[2][0] == "variable":
+                    description["LENGTH"] = i_t[2][1]
+                    i_t = i_t[3:]
+            elif i_t[0][0] == "variable":
+                if i_t[0][1] == "AUTO_INCREMENT":
+                    description["EXTRA"] = i_t[0][1]
+                elif i_t[0][1] == "COMMENT" and len(i_t[1:]) > 2 and i_t[1][1] == '=' and i_t[2][0] == 'variable':
+                    c = i_t[2][1].split('"')
+                    if (len(c) == 3):
+                        description["COMMENT"] = c[1]
+                    else:
+                        return None, None
+                    i_t = i_t[2:]
+                elif i_t[0][1] == "DEFAULT" and len(i_t) > 2 and i_t[1][0] == "variable":
+                    description["DEFAULT"] = i_t[1][1]
+                    i_t = i_t[1:]
+                else:
+                    print("ERROR WHILE FILLING DESCRIPTION")
+                    return None, None
+            elif i_t[0][1] == "NOT" and len(i_t) > 2 and i_t[1][1] == "NULL":
+                description["NULL"] = False
+                i_t = i_t[1:]
+            i_t = i_t[1:]
+        if i_t[0][0] != "separator":
+            print(f"ERROR {i_t[0][1]} is not a separator")
+            return None, None
+        data["DESCRIPTION"].append(description)
+        if i_t[0][1] == ",":
+            i_t = i_t[1:]
+        else:
+            print(f"ERROR {i_t[0][1]} is not a valid separator")
+            return None, None
+        return i_t, data
+
+    @staticmethod
     def create_table_parser(input_tokens, keyword):
-        if keyword == "CREATE TABLE":
-            data = []
-            while len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
-                data.append(["TABLE_NAME", input_tokens[0][1]])
-                lst.append(input_tokens[0][1])
-                input_tokens = input_tokens[1:]
-        return (input_tokens, keyword)
+        # print("INSIDE CREATE TABLE PARSER")
+        if input_tokens[0][0] != "variable":
+            # print("RETURN 1")
+            return None, None
+        data = {
+            "NAME": input_tokens[0][1],
+            "DESCRIPTION": []
+        }
+        input_tokens = input_tokens[1:]
+        brackets_stack = []
+        while len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
+            i_t = input_tokens
+            if i_t[0][0] == "separator" and i_t[0][1] == "(":
+                brackets_stack.append(i_t[0][1])
+                i_t = i_t[1:]
+            elif i_t[0][0] == "variable" and len(i_t[1:]) > 1:
+                # call to fill description
+                i_t, data = Parser.fill_description(i_t, data)
+            if i_t[0][1] == ")":
+                i_t = i_t[1:]
+            input_tokens = i_t
+
+        # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        # print(data)
+        # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        return input_tokens, Node(keyword=keyword, data=data)
 
     @staticmethod
     def use_create_database_parser(input_tokens, keyword):
@@ -170,7 +238,7 @@ class Parser:
     @staticmethod
     def parser(txt):
         instructions = Parser.get_input_tokens_list(txt)
-        Parser.pretty_print("INSTRUCTIONS:", instructions)
+        # Parser.pretty_print("INSTRUCTIONS:", instructions)
         parsingTree = None
         for input_tokens in instructions:
             while len(input_tokens) > 0:
