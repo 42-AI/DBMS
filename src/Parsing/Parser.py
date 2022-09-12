@@ -98,6 +98,9 @@ class Parser:
                 elif i_t[0][1] == "DEFAULT" and len(i_t) > 2 and i_t[1][0] == "variable":
                     description["DEFAULT"] = i_t[1][1]
                     i_t = i_t[1:]
+                elif i_t[0][1] == "PRIMARY" and len(i_t) > 2 and i_t[1][1] == "KEY":
+                    description["KEY"] = 'PRI'
+                    i_t = i_t[1:]
                 else:
                     print("ERROR WHILE FILLING DESCRIPTION")
                     return None, None
@@ -140,9 +143,9 @@ class Parser:
                 i_t = i_t[1:]
             input_tokens = i_t
 
-        # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        # print(data)
-        # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print(data)
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         return input_tokens, Node(keyword=keyword, data=data)
 
     @staticmethod
