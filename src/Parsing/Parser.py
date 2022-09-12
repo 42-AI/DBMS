@@ -1,7 +1,7 @@
 import re
 import sys
-from parser_constants import precedences, keywords_list, data_types
-from ParsingNode import Node
+from src.Parsing.Constants import precedences, keywords_list, data_types
+from src.Parsing.ParsingNode import Node
 
 
 def has_greater_precedence(op1, op2):
@@ -63,7 +63,6 @@ class Parser:
                     tokens.append([elem_type, elem])
             instructions.append(tokens)
         return instructions
-
 
     @staticmethod
     def fill_description(i_t, data):
@@ -169,7 +168,6 @@ class Parser:
     @staticmethod
     def create_db_parser(input_tokens, keyword):
         return Parser.simple_parser(input_tokens, keyword)
-        
 
     @staticmethod
     def show_parser(input_tokens, keyword):
@@ -188,7 +186,7 @@ class Parser:
     @staticmethod
     def parser(txt):
         instructions = Parser.get_input_tokens_list(txt)
-        # Parser.pretty_print("INSTRUCTIONS:", instructions)
+        Parser.pretty_print("INSTRUCTIONS:", instructions)
         parsingTree = None
         for input_tokens in instructions:
             while len(input_tokens) > 0:

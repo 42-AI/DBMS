@@ -2,7 +2,7 @@ from pathlib import Path
 import os, sys
 import os.path as path
 import shutil
-from utils import colors
+from src.utils import colors
 _MAIN_PATH_NAME = ".dbms"
 _MAIN_PATH = path.join(os.getcwd(), _MAIN_PATH_NAME)
 

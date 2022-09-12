@@ -3,14 +3,14 @@ class TableManager:
     db_name = ''
     table_name = ''
     table_description = ''
-    meta_description = this.table_description[0].keys()
+    meta_description = TableManager.table_description[0].keys()
 
 ########## Creation: Public #######
     @staticmethod
     def create_table(table_name: str, db_name: str, table_description: array):
-        this.db_name = db_name
-        this.table_name = table_name
-        this.table_description = table_description
+        TableManager.db_name = db_name
+        TableManager.table_name = table_name
+        TableManager.table_description = table_description
         TableManager._create_table_file()
         TableManager._create_meta_table_file()
 
@@ -20,14 +20,14 @@ class TableManager:
     @staticmethod
     def _create_table_file():
         table_fields = TableManager._get_table_fields();
-        return TableManager.create_file(this.table_name, this.db_name, table_fields)
+        return TableManager.create_file(TableManager.table_name, TableManager.db_name, table_fields)
 
     @staticmethod
     def _create_meta_table_file():
-        meta_tabel_name = "meta" + this.table_name
+        meta_tabel_name = "meta" + TableManager.table_name
         meta_description = TableManager._get_meta_description
         meta_content = TableManager._get_meta_content
-        return TableManager.create_file(meta_tabel_name, this.db_name, f"{meta_description}\n{meta_content}")
+        return TableManager.create_file(meta_tabel_name, TableManager.db_name, f"{meta_description}\n{meta_content}")
 
     @staticmethod
     def _create_file(file_name: str, dir_name: str, file_content: str):
@@ -46,20 +46,20 @@ class TableManager:
     @staticmethod
     def _get_table_fields():
         fields = ''
-        for field in this.table_description:
+        for field in TableManager.table_description:
             fields += field["FIELD"] + ", "
         return fields[:-2] + '\n'
 
     @staticmethod
     def _get_meta_description():
-        return ",".join(str(key) for key in this.table_description[0].keys())
+        return ",".join(str(key) for key in TableManager.table_description[0].keys())
 
     @staticmethod
     def _get_meta_content():
         meta_content = ''
-        for field in this.table_description:
+        for field in TableManager.table_description:
             field_meta = ''
-            for meta_field in this.meta_description:
+            for meta_field in TableManager.meta_description:
                 field_meta += field[meta_field] + ','
             meta_content += field_meta[:-1] + '\n'
         return meta_content[:-1]

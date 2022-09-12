@@ -1,8 +1,8 @@
 import sys
 
-from SQLprompt import SQLprompt
-from parser import Parser
-from Interpreter import Interpreter
+from src.SQLprompt import SQLprompt
+from src.Parsing.Parser import Parser
+from src.Interpreter import Interpreter
 
 
 def main():
