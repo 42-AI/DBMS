@@ -3,8 +3,10 @@ from Show import Show
 import sys
 from utils import colors
 
+
 class DatabaseName:
     db_name = None
+
 
 class Interpreter:
     @staticmethod
@@ -18,9 +20,9 @@ class Interpreter:
             "SHOW TABLES": lambda node: Show.tables(node.data),
         }
         while parsingTree:
-            print(f"{colors.WARNING}DATABASE NAME: {DatabaseName.data}{colors.ENDC}")
+            # print(f"{colors.WARNING}DATABASE NAME: {DatabaseName.db_name}{colors.ENDC}")
             if parsingTree.keyword == "USE":
-                DatabaseName.data = parsingTree.data
+                DatabaseName.db_name = parsingTree.data
             elif parsingTree.keyword in keyword_functions.keys():
                 keyword_functions[parsingTree.keyword](parsingTree)
             parsingTree = parsingTree.next
