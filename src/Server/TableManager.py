@@ -20,9 +20,15 @@ class TableManager:
         TableManager._create_table_file()
         TableManager._create_meta_table_file()
 
+    @staticmethod
+    def drop_table(db_name: str, table_name: str):
+        TableManager.db_name = db_name
+        TableManager.table_name = table_name
+        TableManager._delete_table_file()
+        TableManager._delete_meta_table_file()
 
 
-######### Creaton: Private ########
+######### Creation: Private ########
     @staticmethod
     def _create_table_file():
         table_fields = TableManager._get_table_fields();
@@ -30,7 +36,7 @@ class TableManager:
 
     @staticmethod
     def _create_meta_table_file():
-        meta_tabel_name = "meta_" + TableManager.table_name
+        meta_tabel_name = TableManager.get_meta_name()
         meta_description = TableManager._get_meta_description()
         meta_content = TableManager._get_meta_content()
         return TableManager._create_file(meta_tabel_name, TableManager.db_name, f"{meta_description}\n{meta_content}")
@@ -48,6 +54,8 @@ class TableManager:
         f.write(file_content)
         f.close()
         return file_fullPath
+
+    ######### Get: Private ########
 
     @staticmethod
     def _get_table_fields():
@@ -70,10 +78,26 @@ class TableManager:
             meta_content += str(field_meta[:-1]) + '\n'
         return meta_content[:-1]
 
+    @staticmethod
+    def get_tables(db_name):
+        dir_list = os.listdir(os.getcwd())
+        if _MAIN_PATH_NAME not in dir_list:
+            print(f"{colors.BOLD}Empty set{colors.ENDC}")
+            return
+        return os.listdir(ServerTools.get_dir_fullPath(db_name))
 
+######### Delete: Private ########
 
     @staticmethod
-    def drop_table_file(table_name: str, db_name: str):
+    def _delete_table_file():
+        TableManager._delete_file(TableManager.db_name, TableManager.table_name)
+
+    @staticmethod
+    def _delete_meta_table_file():
+        TableManager._delete_file(TableManager.db_name, TableManager.get_meta_name())
+
+    @staticmethod
+    def _delete_file(db_name: str, table_name: str):
         table_fullPath = ServerTools.get_file_fullPath(table_name, db_name)
         db_fullPath = ServerTools.get_dir_fullPath(db_name)
         if not table_fullPath:
@@ -87,11 +111,7 @@ class TableManager:
             return
         os.remove(table_fullPath)
 
+######### Delete: Private ########
     @staticmethod
-    def get_tables(db_name):
-        dir_list = os.listdir(os.getcwd())
-        if _MAIN_PATH_NAME not in dir_list:
-            print(f"{colors.BOLD}Empty set{colors.ENDC}")
-            return
-        return os.listdir(ServerTools.get_dir_fullPath(db_name))
-
+    def get_meta_name():
+        return "meta_" + TableManager.table_name

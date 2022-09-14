@@ -28,3 +28,8 @@ class FileSystemManager:
             print("Please select a DB")
         else:
             TableManager.create_table(db_name, data['NAME'], data['DESCRIPTION'])
+
+
+    @staticmethod
+    def drop_table(db_name, data):
+        TableManager.drop_table(db_name, data)
