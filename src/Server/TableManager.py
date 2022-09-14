@@ -31,11 +31,11 @@ class TableManager:
 
     @staticmethod
     def _create_file(file_name: str, dir_name: str, file_content: str):
-        file_fullPath = FileSystemManager._get_file_fullPath(dir_name, file_name)
+        file_fullPath = ServerTools.get_file_fullPath(dir_name, file_name)
         if path.exists(file_fullPath):
             print(f"Error: table {file_name} already exists.", file=sys.stderr)
             return
-        if not path.isdir(path.expanduser(FileSystemManager._get_dir_fullPath(db_name))):
+        if not path.isdir(path.expanduser(ServerTools.get_dir_fullPath(db_name))):
             print(f"Error: database {dir_name} doesn't exists.", file=sys.stderr)
             return
         f = open(file_name, "x")
@@ -68,8 +68,8 @@ class TableManager:
 
     @staticmethod
     def drop_table_file(table_name: str, db_name: str):
-        table_fullPath = FileSystemManager._get_file_fullPath(table_name, db_name)
-        db_fullPath = FileSystemManager._get_dir_fullPath(db_name)
+        table_fullPath = ServerTools.get_file_fullPath(table_name, db_name)
+        db_fullPath = ServerTools.get_dir_fullPath(db_name)
         if not table_fullPath:
             print("no valid table")
             return
@@ -87,5 +87,5 @@ class TableManager:
         if _MAIN_PATH_NAME not in dir_list:
             print(f"{colors.BOLD}Empty set{colors.ENDC}")
             return
-        return os.listdir(FileSystemManager._get_dir_fullPath(db_name))
+        return os.listdir(ServerTools.get_dir_fullPath(db_name))
 

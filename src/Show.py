@@ -15,7 +15,7 @@ class Show:
 
     @staticmethod
     def databases():
-        dbs = fsm.get_dbs()
+        dbs = fsm.get_databases()
         if dbs is not None:
             Show.print_content("Database", dbs)
 
