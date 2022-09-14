@@ -73,7 +73,7 @@ class Parser:
         while not (i_t[0][0] == "separator" and i_t[0][1] == ",") and len(i_t) > 1:
             if i_t[0][0] == "datatype" and i_t[0][1].upper() in data_types.keys():
                 description["TYPE"] = i_t[0][1].upper()
-                description["LENGTH"] = data_types[i_t[0][1]]
+                description["LENGTH"] = data_types[i_t[0][1].upper()]
                 if len(i_t[1:]) > 3 and i_t[1][1] == "(" and i_t[3][1] == ")" and i_t[2][0] == "variable":
                     description["LENGTH"] = i_t[2][1]
                     i_t = i_t[3:]
@@ -106,7 +106,7 @@ class Parser:
         data["DESCRIPTION"].append(description)
         if i_t[0][1] == ",":
             i_t = i_t[1:]
-        else:
+        elif i_t[0][1] != ")":
             print(f"ERROR {i_t[0][1]} is not a valid separator")
             return None, None
         return i_t, data
@@ -123,7 +123,7 @@ class Parser:
         }
         input_tokens = input_tokens[1:]
         brackets_stack = []
-        while len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
+        while input_tokens and len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
             i_t = input_tokens
             if i_t[0][0] == "separator" and i_t[0][1] == "(":
                 brackets_stack.append(i_t[0][1])
@@ -131,7 +131,7 @@ class Parser:
             elif i_t[0][0] == "variable" and len(i_t[1:]) > 1:
                 # call to fill description
                 i_t, data = Parser.fill_description(i_t, data)
-            if i_t[0][1] == ")":
+            if i_t and i_t[0][1] == ")":
                 i_t = i_t[1:]
             input_tokens = i_t
 
@@ -200,7 +200,7 @@ class Parser:
                 # print("==", keyword, input_tokens)
 
                 if keyword != "":
-                    input_tokens, new_node = Parser.keyword_functions[keyword](
+                    input_tokens, new_node = Parser.keyword_functions[keyword.upper()](
                         input_tokens, keyword)
                     parsingTree = add_to_parsing_tree(parsingTree, new_node)
                 else:
