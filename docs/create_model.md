@@ -1,7 +1,7 @@
 ```sql
 create table customers
 (
-	customer_id  int AUTO_INCREMENT comment="This is a random comment",
+	customer_id  int PRIMARY KEY AUTO_INCREMENT comment="This is a random comment",
 	first_name	char(32) NOT NULL,
 	last_name	char(32),
 	status		int DEFAULT 1,
@@ -21,7 +21,7 @@ data = {
 			'TYPE': 'INT',
 			'LENGTH': 11,
 			'NULL': True,
-			'KEY': '',
+			'KEY': 'PRI',
 			'DEFAULT': '',
 			'EXTRA': 'AUTO_INCREMENT',
 			'COMMENT': 'THIS IS A RANDOM COMMENT'
