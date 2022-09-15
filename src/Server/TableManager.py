@@ -103,32 +103,9 @@ class TableManager:
         tables = os.listdir(ServerTools.get_db_dir_full_path(TableManager.db_name))
         return tables
 
-######### Delete: Private ########
+    ######### Delete: Private ########
 
     @staticmethod
     def _delete_table_dir():
         table_dir_full_path = ServerTools.get_table_dir_full_path(TableManager.db_name, TableManager.table_name)
         shutil.rmtree(table_dir_full_path)
-
- #   @staticmethod
- #   def _delete_table_file():
- #       TableManager._delete_file(TableManager.db_name, TableManager.table_name)
-
- #   @staticmethod
- #   def _delete_meta_table_file():
- #       TableManager._delete_file(TableManager.db_name, TableManager.get_meta_name())
-
- #   @staticmethod
- #   def _delete_file(db_name: str, table_name: str):
- #       table_full_path = ServerTools.get_file_full_path(table_name, db_name)
- #       db_full_path = ServerTools.get_db_dir_full_path(db_name)
- #       if not table_full_path:
- #           print("no valid table")
- #           return
- #       if not path.exists(table_full_path):
- #           print(f"Error: table {table_name} doesn't exists.", file=sys.stderr)
- #           return
- #       if not path.isdir(path.expanduser(db_full_path)):
- #           print(f"Error: database {db_name} doesn't exists.", file=sys.stderr)
- #           return
- #       os.remove(table_full_path)
