@@ -13,16 +13,16 @@ class Interpreter:
     def execute(parsingTree):
         keyword_functions = {
             "DROP DATABASE": lambda node: fsm.drop_db(node.data),
-            # "DROP TABLE": lambda node: fsm.drop_table_file(node.name, node.data),
-            "CREATE TABLE": lambda node: fsm.create_table_file(node.name, node.data, node.lst),
+            "DROP TABLE": lambda node: fsm.drop_table(DatabaseName.db_name, node.data),
+            "CREATE TABLE": lambda node: fsm.create_table(DatabaseName.db_name, node.data),
             "CREATE DATABASE": lambda node: fsm.create_db(node.data),
             "SHOW DATABASES": lambda node: Show.databases(),
-            "SHOW TABLES": lambda node: Show.tables(node.data),
+            "SHOW TABLES": lambda node: Show.tables(DatabaseName.db_name),
         }
         while parsingTree:
             # print(f"{colors.WARNING}DATABASE NAME: {DatabaseName.db_name}{colors.ENDC}")
             if parsingTree.keyword == "USE":
                 DatabaseName.db_name = parsingTree.data
-            elif parsingTree.keyword in keyword_functions.keys():
-                keyword_functions[parsingTree.keyword](parsingTree)
+            elif parsingTree.keyword.upper() in keyword_functions.keys():
+                keyword_functions[parsingTree.keyword.upper()](parsingTree)
             parsingTree = parsingTree.next
