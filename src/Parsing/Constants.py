@@ -25,6 +25,7 @@ keywords_list = [
     "DESCRIBE",
     "ALTER",
     "DISTINCT",
+    "VALUES",
 ]
 
 data_types = {
