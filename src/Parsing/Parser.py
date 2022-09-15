@@ -31,12 +31,44 @@ class Parser:
     }
 
     @staticmethod
+    def split_instruction(inst):
+        printable_list = list(range(ord('!'), ord('~') + 1)) + \
+            list(range(ord('¡'), ord('ÿ') + 1)) + [ord('€')]
+        result = []
+        word = ""
+        quote = ""
+        i = 0
+        while i < len(inst):
+            if inst[i] in "\"'":
+                quote = inst[i]
+                i += 1
+                while i < len(inst) and inst[i] != quote:
+                    word += inst[i]
+                    i += 1
+                if inst[i] == quote:
+                    i += 1
+                    result.append(word)
+                    word = ""
+                    quote = ""
+            elif inst[i] in "(),=":
+                result.append(inst[i])
+                i += 1
+            elif inst[i] in "\t\r\n ":
+                i += 1
+            elif ord(inst[i]) in printable_list:
+                while i < len(inst) and (ord(inst[i]) in printable_list) and not (inst[i] in "\t\r\n (),=\"\'"):
+                    word += inst[i]
+                    i += 1
+                result.append(word)
+                word = ""
+            else:
+                print(f"Error: Character {inst[i]} not recognized")
+                return
+        return result
+
+    @staticmethod
     def get_input_tokens_list(txt):
-        tmp = [
-            [e for e in re.split(
-                '("[ !#-&(-~]*"|\'[ !#-&(-~]*\'|[^_@$#a-zA-Z0-9])', inst) if e not in ' \n']
-            for inst in txt.split(';') if inst != ''
-        ]
+        tmp = [Parser.split_instruction(inst) for inst in txt.split(';') if inst != '']
         instructions = []
         for line in tmp:
             tokens = []
