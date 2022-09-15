@@ -1,47 +1,77 @@
+from src.Server.ServerTools import ServerTools
+import src.Server.ServerTools as Tools
+import os.path as path
+import os, sys
+import shutil
+
+
 class TableManager:
 
     db_name = ''
     table_name = ''
     table_description = ''
-    meta_description = TableManager.table_description[0].keys()
+    meta_description = ''
 
 ########## Creation: Public #######
     @staticmethod
-    def create_table(table_name: str, db_name: str, table_description: array):
+    def create_table(db_name: str, table_name: str, table_description):
         TableManager.db_name = db_name
         TableManager.table_name = table_name
         TableManager.table_description = table_description
+        TableManager.meta_description = table_description[0].keys()
+        TableManager._create_table_dir()
         TableManager._create_table_file()
         TableManager._create_meta_table_file()
 
+    ########## Delete: Public #######
+    @staticmethod
+    def drop_table(db_name: str, table_name: str):
+        TableManager.db_name = db_name
+        TableManager.table_name = table_name
+        TableManager._delete_table_dir()
 
+    ########## get: Public #######
+    @staticmethod
+    def get_tables(db_name: str):
+        TableManager.db_name = db_name
+        return TableManager._get_tables_array()
 
-######### Creaton: Private ########
+    ######### Creation: Private ########
     @staticmethod
     def _create_table_file():
         table_fields = TableManager._get_table_fields();
-        return TableManager.create_file(TableManager.table_name, TableManager.db_name, table_fields)
+        file_type = "data"
+        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, table_fields)
 
     @staticmethod
     def _create_meta_table_file():
-        meta_tabel_name = "meta" + TableManager.table_name
-        meta_description = TableManager._get_meta_description
-        meta_content = TableManager._get_meta_content
-        return TableManager.create_file(meta_tabel_name, TableManager.db_name, f"{meta_description}\n{meta_content}")
+        meta_description = TableManager._get_meta_description()
+        meta_content = TableManager._get_meta_content()
+        file_type = "meta"
+        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, f"{meta_description}\n{meta_content}")
 
     @staticmethod
-    def _create_file(file_name: str, dir_name: str, file_content: str):
-        file_fullPath = ServerTools.get_file_fullPath(dir_name, file_name)
-        if path.exists(file_fullPath):
+    def _create_file(table_name: str, dir_name: str, file_type: str, file_content: str):
+        file_name = file_type + ".csv"
+        file_full_path = ServerTools.get_file_full_path(table_name, dir_name, file_name)
+        if path.exists(file_full_path):
             print(f"Error: table {file_name} already exists.", file=sys.stderr)
             return
-        if not path.isdir(path.expanduser(ServerTools.get_dir_fullPath(db_name))):
+        if not path.isdir(path.expanduser(ServerTools.get_db_dir_full_path(dir_name))):
             print(f"Error: database {dir_name} doesn't exists.", file=sys.stderr)
             return
-        f = open(file_name, "x")
+        f = open(file_full_path, "x")
         f.write(file_content)
         f.close()
-        return file_fullPath
+        return file_full_path
+
+    @staticmethod
+    def _create_table_dir():
+        table_dir_full_path = ServerTools.get_table_dir_full_path(TableManager.db_name, TableManager.table_name)
+        os.mkdir(path.expanduser(table_dir_full_path))
+
+
+    ######### Get: Private ########
 
     @staticmethod
     def _get_table_fields():
@@ -60,32 +90,22 @@ class TableManager:
         for field in TableManager.table_description:
             field_meta = ''
             for meta_field in TableManager.meta_description:
-                field_meta += field[meta_field] + ','
-            meta_content += field_meta[:-1] + '\n'
+                field_meta += str(field[meta_field]) + ','
+            meta_content += str(field_meta[:-1]) + '\n'
         return meta_content[:-1]
 
-
-
     @staticmethod
-    def drop_table_file(table_name: str, db_name: str):
-        table_fullPath = ServerTools.get_file_fullPath(table_name, db_name)
-        db_fullPath = ServerTools.get_dir_fullPath(db_name)
-        if not table_fullPath:
-            print("no valid table")
-            return
-        if not path.exists(table_fullPath):
-            print(f"Error: table {table_name} doesn't exists.", file=sys.stderr)
-            return
-        if not path.isdir(path.expanduser(db_fullPath)):
-            print(f"Error: database {db_name} doesn't exists.", file=sys.stderr)
-            return
-        os.remove(table_fullPath)
-
-    @staticmethod
-    def get_tables(db_name):
+    def _get_tables_array():
         dir_list = os.listdir(os.getcwd())
-        if _MAIN_PATH_NAME not in dir_list:
-            print(f"{colors.BOLD}Empty set{colors.ENDC}")
-            return
-        return os.listdir(ServerTools.get_dir_fullPath(db_name))
+#        if dir_list not in Tools.MAIN_PATH:
+#            print(f"{colors.BOLD}Empty set{colors.ENDC}")
+#            return
+        tables = os.listdir(ServerTools.get_db_dir_full_path(TableManager.db_name))
+        return tables
 
+    ######### Delete: Private ########
+
+    @staticmethod
+    def _delete_table_dir():
+        table_dir_full_path = ServerTools.get_table_dir_full_path(TableManager.db_name, TableManager.table_name)
+        shutil.rmtree(table_dir_full_path)

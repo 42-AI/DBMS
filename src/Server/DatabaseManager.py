@@ -10,22 +10,22 @@ class DatabaseManager:
     @staticmethod
     def create_db_dir(db_name: str):
         DatabaseManager._create_main_directory()
-        db_fullPath = path.join(Tools.MAIN_PATH, db_name)
-        if path.isdir(path.expanduser(db_fullPath)):
+        db_full_path = path.join(Tools.MAIN_PATH, db_name)
+        if path.isdir(path.expanduser(db_full_path)):
             print(f"Error: database {db_name} already exists.", file=sys.stderr)
             return
-        os.mkdir(path.expanduser(db_fullPath))
+        os.mkdir(path.expanduser(db_full_path))
 
     @staticmethod
     def drop_db_dir(db_name: str):
-        db_dir_fullPath = ServerTools.get_dir_fullPath(db_name)
-        if not db_dir_fullPath:
+        db_dir_full_path = ServerTools.get_db_dir_full_path(db_name)
+        if not db_dir_full_path:
             print("no valid DB used")
             return
-        if not path.isdir(db_dir_fullPath):
+        if not path.isdir(db_dir_full_path):
             print(f"Error: database {db_name} doesn't exists.", file=sys.stderr)
             return
-        shutil.rmtree(db_dir_fullPath)
+        shutil.rmtree(db_dir_full_path)
 
     @staticmethod
     def get_dbs():
@@ -34,11 +34,7 @@ class DatabaseManager:
             print(f"{colors.BOLD}Empty set{colors.ENDC}")
             return
         elements = os.listdir(Tools.MAIN_PATH)
-        dbs = []
-        for element in elements:
-            if path.isdir(ServerTools.get_file_fullPath(element, Tools.MAIN_PATH)):
-                dbs.append(element)
-        return dbs
+        return elements
 
     @staticmethod
     def _create_main_directory():
