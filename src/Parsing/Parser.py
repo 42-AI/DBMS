@@ -113,11 +113,7 @@ class Parser:
                 if i_t[0][1].upper() == "AUTO_INCREMENT":
                     description["EXTRA"] = i_t[0][1]
                 elif i_t[0][1].upper() == "COMMENT" and len(i_t[1:]) > 2 and i_t[1][1] == '=' and i_t[2][0] == 'variable':
-                    c = i_t[2][1].split('"')
-                    if (len(c) == 3):
-                        description["COMMENT"] = c[1]
-                    else:
-                        return None, None
+                    description["COMMENT"] = i_t[2][1]
                     i_t = i_t[2:]
                 elif i_t[0][1].upper() == "DEFAULT" and len(i_t) > 2 and i_t[1][0] == "variable":
                     description["DEFAULT"] = i_t[1][1]
@@ -266,7 +262,7 @@ class Parser:
         Parser.pretty_print("INSTRUCTIONS:", instructions)
         parsingTree = None
         for input_tokens in instructions:
-            while len(input_tokens) > 0:
+            while input_tokens and len(input_tokens) > 0:
                 # concat group of keyword (ex: "CREATE TABLE", "SHOW DATABASES"...)
                 keyword = ""
                 while len(input_tokens) > 0 and input_tokens[0][0] == "keyword":
