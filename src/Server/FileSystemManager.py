@@ -29,6 +29,12 @@ class FileSystemManager:
         else:
             TableManager.create_table(db_name, data['NAME'], data['DESCRIPTION'])
 
+    @staticmethod
+    def get_tables(db_name):
+        if db_name is None:
+            print("Please select a DB")
+        else:
+            return TableManager.get_tables(db_name)
 
     @staticmethod
     def drop_table(db_name, data):

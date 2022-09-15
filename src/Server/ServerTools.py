@@ -7,18 +7,25 @@ class ServerTools:
 
     ##### Utils ####
     @staticmethod
-    def get_dir_fullPath(_dir: str):
-        if not _dir:
-            print ("_get_dir_fullPath: _dir is null")
+    def get_db_dir_full_path(_db_dir: str):
+        if not _db_dir:
+            print("_get_db_dir_full_path: _dir is null")
             return
-        return path.join(MAIN_PATH , _dir)
+        return path.join(MAIN_PATH , _db_dir)
 
     @staticmethod
-    def get_file_fullPath(file: str, _dir: str):
-        if not _dir:
-            print ("_get_dir_fullPath: _dir is null")
+    def get_table_dir_full_path(_db_dir: str, _table_dir):
+        if not _db_dir:
+            print("_get_db_dir_full_path: _dir is null")
+            return
+        return path.join(ServerTools.get_db_dir_full_path(_db_dir), _table_dir)
+
+    @staticmethod
+    def get_file_full_path(_table_dir: str, _db_dir: str, file:str):
+        if not _db_dir:
+            print ("_get_db_dir_full_path: _dir is null")
             return
         if not file:
-            print ("_get_dir_fullPath: file is null")
+            print ("_get_db_dir_full_path: file is null")
             return
-        return path.join(ServerTools.get_dir_fullPath(_dir), file)
+        return path.join(ServerTools.get_table_dir_full_path(_db_dir, _table_dir), file)
