@@ -36,6 +36,8 @@ class TableManager:
         TableManager.db_name = db_name
         return TableManager._get_tables_array()
 
+
+
     ######### Creation: Private ########
     @staticmethod
     def _create_table_file():
@@ -52,8 +54,7 @@ class TableManager:
 
     @staticmethod
     def _create_file(table_name: str, dir_name: str, file_type: str, file_content: str):
-        file_name = file_type + ".csv"
-        file_full_path = ServerTools.get_file_full_path(table_name, dir_name, file_name)
+        file_full_path = ServerTools.get_file_full_path(table_name, dir_name, file_type)
         if path.exists(file_full_path):
             print(f"Error: table {file_name} already exists.", file=sys.stderr)
             return
