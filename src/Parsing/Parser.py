@@ -27,6 +27,7 @@ class Parser:
         "SHOW TABLES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
         "SHOW DATABASES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
         "USE": lambda input_tokens, keyword: Parser.use_db_parser(input_tokens, keyword),
+        "DESCRIBE": lambda input_tokens, keyword: Parser.describe_parser(input_tokens, keyword),
     }
 
     @staticmethod
@@ -236,6 +237,10 @@ class Parser:
 
     @staticmethod
     def use_db_parser(input_tokens, keyword):
+        return Parser.simple_parser(input_tokens, keyword)
+
+    @staticmethod
+    def describe_parser(input_tokens, keyword):
         return Parser.simple_parser(input_tokens, keyword)
 
     @staticmethod
