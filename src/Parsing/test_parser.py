@@ -1,22 +1,17 @@
 import pytest
 import sys
 import os
-# from src.Parsing.Parser import Parser
+sys.path.append('../src')
+from src.Parsing import Parser
 
-# TESTS keywords_parser
-
-# To test std
-### captured = capsys.readouterr()
-### assert captured.out == "hello\n"
-### assert captured.err == "world\n"
 
 
 #################### test_get_input_tokens_list TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ("", None),
-# ])
-# def test_get_input_tokens_list_valid(entry, expected):
-#     assert Parser.get_input_tokens_list(entry) == expected
+@pytest.mark.parametrize("entry,expected", [
+    ("", []),
+])
+def test_get_input_tokens_list_valid(entry, expected):
+    assert Parser.get_input_tokens_list(entry) == expected
 
 # @pytest.mark.parametrize("entry,expected", [
 #     ("", None),
