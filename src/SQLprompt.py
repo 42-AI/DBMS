@@ -36,7 +36,7 @@ def parsText(text):
 def SQLprompt():
     text = prompt("dbms> ", history=FileHistory('.history.txt'), key_bindings=bindings)
     # print(type(text))
-    if not (type(text) is str) or (text in ["exit", "quit", "\q"]):
+    if not (type(text) is str) or (text in ["exit", "quit", "\\q"]):
         return text
     else:
         return multiLinePrompt(text)
