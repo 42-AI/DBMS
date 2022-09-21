@@ -78,8 +78,8 @@ class TableManager:
     def _get_table_fields():
         fields = ''
         for field in TableManager.table_description:
-            fields += field["FIELD"] + ", "
-        return fields[:-2] + '\n'
+            fields += field["FIELD"] + ","
+        return fields[:-1] + '\n'
 
     @staticmethod
     def _get_meta_description():
