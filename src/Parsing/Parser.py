@@ -1,3 +1,5 @@
+from configparser import ParsingError
+from lib2to3.pgen2.parse import ParseError
 import sys
 from src.Parsing.Constants import precedences, keywords_list, data_types
 from src.Parsing.ParsingNode import Node
@@ -17,8 +19,6 @@ def add_to_parsing_tree(parsingTree, new_node):
 class Parser:
     keyword_functions = {
         # "SELECT": lambda input_tokens, keyword: Parser.select_parser(input_tokens, keyword),
-        # "FROM": lambda input_tokens, keyword: Parser.from_parser(input_tokens, keyword),
-        # "WHERE": lambda input_tokens, keyword: Parser.where_parser(input_tokens, keyword),
         "CREATE TABLE": lambda input_tokens, keyword: Parser.create_table_parser(input_tokens, keyword),
         "DROP DATABASE": lambda input_tokens, keyword: Parser.drop_db_parser(input_tokens, keyword),
         "DROP TABLE": lambda input_tokens, keyword: Parser.drop_table_parser(input_tokens, keyword),
@@ -62,8 +62,7 @@ class Parser:
                 result.append(word)
                 word = ""
             else:
-                print(f"Error: Character {inst[i]} not recognized")
-                return
+                raise ParsingError(f"Error: Character {inst[i]} not recognized")
         return result
 
     @staticmethod
@@ -95,7 +94,7 @@ class Parser:
             "FIELD": "",
             "TYPE": "",
             "LENGTH": None,
-            "NULL": True,  # ==> NOT NULL
+            "NULL": True,  # ==> Nullable
             "KEY": "",
             "DEFAULT": "",
             "EXTRA": "",
@@ -104,7 +103,7 @@ class Parser:
         description['FIELD'] = i_t[0][1]
         i_t = i_t[1:]
         while not (i_t[0][0] == "separator" and i_t[0][1] == ",") and len(i_t) > 1:
-            if i_t[0][0] == "datatype" and i_t[0][1].upper() in data_types.keys():
+            if i_t[0][1].upper() in data_types.keys():
                 description["TYPE"] = i_t[0][1].upper()
                 description["LENGTH"] = data_types[i_t[0][1].upper()]
                 if len(i_t[1:]) > 3 and i_t[1][1] == "(" and i_t[3][1] == ")" and i_t[2][0] == "variable":
@@ -123,21 +122,18 @@ class Parser:
                     description["KEY"] = 'PRI'
                     i_t = i_t[1:]
                 else:
-                    print("ERROR WHILE FILLING DESCRIPTION")
-                    return None, None
+                    raise ParseError("Error while filling Description")
             elif i_t[0][1].upper() == "NOT" and len(i_t) > 2 and i_t[1][1].upper() == "NULL":
                 description["NULL"] = False
                 i_t = i_t[1:]
             i_t = i_t[1:]
         if i_t[0][0] != "separator":
-            print(f"ERROR {i_t[0][1]} is not a separator")
-            return None, None
+            raise ParseError(f"ERROR {i_t[0][1]} is not a separator")
         data["DESCRIPTION"].append(description)
         if i_t[0][1] == ",":
             i_t = i_t[1:]
         elif i_t[0][1] != ")":
-            print(f"ERROR {i_t[0][1]} is not a valid separator")
-            return None, None
+            raise ParseError(f"ERROR {i_t[0][1]} is not a valid separator")
         return i_t, data
 
     @staticmethod
@@ -164,6 +160,45 @@ class Parser:
         return input_tokens, Node(keyword=keyword, data=data)
 
     @staticmethod
+    def fill_insert_header(input_tokens):
+        header = []
+        while input_tokens and len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
+            i_t = input_tokens
+            if i_t[0][0] == "variable" and len(i_t[1:]) > 1:
+                header.append(i_t[0][1])
+            input_tokens = i_t[1:]
+        if input_tokens[0][1].upper() != "VALUES":
+            raise ParsingError("Parsing Error: keyword VALUES missing")
+        else:
+            input_tokens = input_tokens[1:]
+        return header, input_tokens
+
+    @staticmethod
+    def fill_insert_data(header, data, input_tokens):
+        brackets_stack = []
+        tmp = []
+        while input_tokens and len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
+            i_t = input_tokens
+            if i_t[0][1] == "(":
+                brackets_stack.append(i_t[0][1])
+            elif i_t[0][0] == "variable":
+                tmp.append(i_t[0][1])
+            elif i_t and i_t[0][1] == ")":
+                # brackets_stack.append(i_t[0][1])
+                if len(tmp) != len(header):
+                    raise ParsingError(f"Header length different form line length.")
+                else:
+                    dic = dict([(h, d) for h, d in zip(header, tmp)])
+                    data["DATA"].append(dic)
+                tmp = []
+            elif i_t[0][0] == "separator":
+                pass
+            else:
+                raise ParsingError(f"character {input_tokens[0][1]} not recognized.")
+            input_tokens = i_t[1:]
+        return data, input_tokens
+
+    @staticmethod
     def insert_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
             return None, None
@@ -172,50 +207,8 @@ class Parser:
             "DATA": []
         }
         input_tokens = input_tokens[1:]
-        brackets_stack = []
-        header = []
-        while input_tokens and len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
-            i_t = input_tokens
-            if i_t[0][0] == "separator" and i_t[0][1] == "(":
-                brackets_stack.append(i_t[0][1])
-                i_t = i_t[1:]
-            elif i_t[0][0] == "variable" and len(i_t[1:]) > 1:
-                header.append(i_t[0][1])
-                i_t = i_t[1:]
-            elif i_t[0][0] == "separator":
-                i_t = i_t[1:]
-            input_tokens = i_t
-        if input_tokens[0][1].upper() != "VALUES":
-            print("Parsing Error: keyword VALUES missing")
-            return None, None
-        else:
-            input_tokens = input_tokens[1:]
-        data = []
-        brackets_stack = []
-        tmp = []
-        while input_tokens and len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
-            i_t = input_tokens
-            if i_t[0][1] == "(":
-                brackets_stack.append(i_t[0][1])
-                i_t = i_t[1:]
-            elif i_t[0][0] == "variable":
-                tmp.append(i_t[0][1])
-                i_t = i_t[1:]
-            elif i_t and i_t[0][1] == ")":
-                brackets_stack.append(i_t[0][1])
-                i_t = i_t[1:]
-                if len(tmp) != len(header):
-                    return None, None
-                else:
-                    dic = dict([(h, d) for h, d in zip(header, tmp)])
-                    data.append(dic)
-                tmp = []
-            elif i_t[0][0] == "separator":
-                i_t = i_t[1:]
-            else:
-                print(f"Error: character {input_tokens[0][1]} not recognized.")
-                return None, None
-            input_tokens = i_t
+        header, input_tokens = Parser.fill_insert_header(input_tokens)
+        data, input_tokens = Parser.fill_insert_data(header, data, input_tokens)
 
         return input_tokens, Node(keyword=keyword, data=data)
 
@@ -262,28 +255,36 @@ class Parser:
         print("========================")
 
     @staticmethod
+    def concat_keywords(input_tokens):
+        # concat group of keyword (ex: "CREATE TABLE", "SHOW DATABASES"...)
+        keyword = ""
+        while len(input_tokens) > 0 and input_tokens[0][0] == "keyword":
+            keyword += " " + input_tokens[0][1]
+            input_tokens = input_tokens[1:]
+        keyword = keyword.strip()
+        return keyword, input_tokens
+
+    @staticmethod
+    def print_node(node):
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print("KEYWORD:", node.keyword)
+        print("DATA:", node.data)
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+
+    @staticmethod
     def parser(txt):
         instructions = Parser.get_input_tokens_list(txt)
         Parser.pretty_print("INSTRUCTIONS:", instructions)
         parsingTree = None
         for input_tokens in instructions:
             while input_tokens and len(input_tokens) > 0:
-                # concat group of keyword (ex: "CREATE TABLE", "SHOW DATABASES"...)
-                keyword = ""
-                while len(input_tokens) > 0 and input_tokens[0][0] == "keyword":
-                    keyword += " " + input_tokens[0][1]
-                    input_tokens = input_tokens[1:]
-                keyword = keyword.strip()
+                keyword, input_tokens = Parser.concat_keywords(input_tokens)
 
                 if keyword != "":
                     input_tokens, new_node = Parser.keyword_functions[keyword.upper()](
                         input_tokens, keyword)
-                    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-                    print("KEYWORD:", new_node.keyword)
-                    print("DATA:", new_node.data)
-                    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+                    Parser.print_node(new_node)
                     parsingTree = add_to_parsing_tree(parsingTree, new_node)
                 else:
-                    print("parsing error", file=sys.stderr)
-                    return
-            return parsingTree
+                    raise ParsingError("Error in Parser function")
+        return parsingTree
