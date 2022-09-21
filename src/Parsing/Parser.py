@@ -1,4 +1,3 @@
-import re
 import sys
 from src.Parsing.Constants import precedences, keywords_list, data_types
 from src.Parsing.ParsingNode import Node
@@ -28,15 +27,49 @@ class Parser:
         "SHOW TABLES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
         "SHOW DATABASES": lambda input_tokens, keyword: Parser.show_parser(input_tokens, keyword),
         "USE": lambda input_tokens, keyword: Parser.use_db_parser(input_tokens, keyword),
+        "DESCRIBE": lambda input_tokens, keyword: Parser.describe_parser(input_tokens, keyword),
     }
 
     @staticmethod
+    def split_instruction(inst):
+        printable_list = list(range(ord('!'), ord('~') + 1)) + \
+            list(range(ord('¡'), ord('ÿ') + 1)) + [ord('€')]
+        result = []
+        word = ""
+        quote = ""
+        i = 0
+        while i < len(inst):
+            if inst[i] in "\"'":
+                quote = inst[i]
+                i += 1
+                while i < len(inst) and inst[i] != quote:
+                    word += inst[i]
+                    i += 1
+                if inst[i] == quote:
+                    i += 1
+                    result.append(word)
+                    word = ""
+                    quote = ""
+            elif inst[i] in "(),=":
+                result.append(inst[i])
+                i += 1
+            elif inst[i] in "\t\r\n ":
+                i += 1
+            elif ord(inst[i]) in printable_list:
+                while i < len(inst) and (ord(inst[i]) in printable_list) and not (inst[i] in "\t\r\n (),=\"\'"):
+                    word += inst[i]
+                    i += 1
+                result.append(word)
+                word = ""
+            else:
+                print(f"Error: Character {inst[i]} not recognized")
+                return
+        return result
+
+    @staticmethod
     def get_input_tokens_list(txt):
-        tmp = [
-            [e for e in re.split(
-                '("[ !#-&(-~]*"|\'[ !#-&(-~]*\'|[^_@$#a-zA-Z0-9])', inst) if e not in ' \n']
-            for inst in txt.split(';') if inst != ''
-        ]
+        tmp = [Parser.split_instruction(inst)
+               for inst in txt.split(';') if inst != '']
         instructions = []
         for line in tmp:
             tokens = []
@@ -81,11 +114,7 @@ class Parser:
                 if i_t[0][1].upper() == "AUTO_INCREMENT":
                     description["EXTRA"] = i_t[0][1]
                 elif i_t[0][1].upper() == "COMMENT" and len(i_t[1:]) > 2 and i_t[1][1] == '=' and i_t[2][0] == 'variable':
-                    c = i_t[2][1].split('"')
-                    if (len(c) == 3):
-                        description["COMMENT"] = c[1]
-                    else:
-                        return None, None
+                    description["COMMENT"] = i_t[2][1]
                     i_t = i_t[2:]
                 elif i_t[0][1].upper() == "DEFAULT" and len(i_t) > 2 and i_t[1][0] == "variable":
                     description["DEFAULT"] = i_t[1][1]
@@ -113,9 +142,7 @@ class Parser:
 
     @staticmethod
     def create_table_parser(input_tokens, keyword):
-        # print("INSIDE CREATE TABLE PARSER")
         if input_tokens[0][0] != "variable":
-            # print("RETURN 1")
             return None, None
         data = {
             "NAME": input_tokens[0][1],
@@ -129,20 +156,68 @@ class Parser:
                 brackets_stack.append(i_t[0][1])
                 i_t = i_t[1:]
             elif i_t[0][0] == "variable" and len(i_t[1:]) > 1:
-                # call to fill description
                 i_t, data = Parser.fill_description(i_t, data)
             if i_t and i_t[0][1] == ")":
                 i_t = i_t[1:]
             input_tokens = i_t
 
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        print(data)
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         return input_tokens, Node(keyword=keyword, data=data)
 
     @staticmethod
-    def insert_parser(input_token, keyword):
-        pass
+    def insert_parser(input_tokens, keyword):
+        if input_tokens[0][0] != "variable":
+            return None, None
+        data = {
+            "NAME": input_tokens[0][1],
+            "DATA": []
+        }
+        input_tokens = input_tokens[1:]
+        brackets_stack = []
+        header = []
+        while input_tokens and len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
+            i_t = input_tokens
+            if i_t[0][0] == "separator" and i_t[0][1] == "(":
+                brackets_stack.append(i_t[0][1])
+                i_t = i_t[1:]
+            elif i_t[0][0] == "variable" and len(i_t[1:]) > 1:
+                header.append(i_t[0][1])
+                i_t = i_t[1:]
+            elif i_t[0][0] == "separator":
+                i_t = i_t[1:]
+            input_tokens = i_t
+        if input_tokens[0][1].upper() != "VALUES":
+            print("Parsing Error: keyword VALUES missing")
+            return None, None
+        else:
+            input_tokens = input_tokens[1:]
+        data = []
+        brackets_stack = []
+        tmp = []
+        while input_tokens and len(input_tokens) > 0 and input_tokens[0][0] != "keyword":
+            i_t = input_tokens
+            if i_t[0][1] == "(":
+                brackets_stack.append(i_t[0][1])
+                i_t = i_t[1:]
+            elif i_t[0][0] == "variable":
+                tmp.append(i_t[0][1])
+                i_t = i_t[1:]
+            elif i_t and i_t[0][1] == ")":
+                brackets_stack.append(i_t[0][1])
+                i_t = i_t[1:]
+                if len(tmp) != len(header):
+                    return None, None
+                else:
+                    dic = dict([(h, d) for h, d in zip(header, tmp)])
+                    data.append(dic)
+                tmp = []
+            elif i_t[0][0] == "separator":
+                i_t = i_t[1:]
+            else:
+                print(f"Error: character {input_tokens[0][1]} not recognized.")
+                return None, None
+            input_tokens = i_t
+
+        return input_tokens, Node(keyword=keyword, data=data)
 
     @staticmethod
     def simple_parser(input_tokens, keyword):
@@ -162,6 +237,10 @@ class Parser:
 
     @staticmethod
     def use_db_parser(input_tokens, keyword):
+        return Parser.simple_parser(input_tokens, keyword)
+
+    @staticmethod
+    def describe_parser(input_tokens, keyword):
         return Parser.simple_parser(input_tokens, keyword)
 
     @staticmethod
@@ -188,20 +267,21 @@ class Parser:
         Parser.pretty_print("INSTRUCTIONS:", instructions)
         parsingTree = None
         for input_tokens in instructions:
-            while len(input_tokens) > 0:
-                # print(input_tokens)
-
+            while input_tokens and len(input_tokens) > 0:
                 # concat group of keyword (ex: "CREATE TABLE", "SHOW DATABASES"...)
                 keyword = ""
                 while len(input_tokens) > 0 and input_tokens[0][0] == "keyword":
                     keyword += " " + input_tokens[0][1]
                     input_tokens = input_tokens[1:]
                 keyword = keyword.strip()
-                # print("==", keyword, input_tokens)
 
                 if keyword != "":
                     input_tokens, new_node = Parser.keyword_functions[keyword.upper()](
                         input_tokens, keyword)
+                    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+                    print("KEYWORD:", new_node.keyword)
+                    print("DATA:", new_node.data)
+                    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
                     parsingTree = add_to_parsing_tree(parsingTree, new_node)
                 else:
                     print("parsing error", file=sys.stderr)
