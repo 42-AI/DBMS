@@ -19,11 +19,8 @@ class RowManager:
     ########## Insert: Private #######
     @staticmethod
     def appendLine():
-        file_full_paht = Tools.get_file_full_path(RRowManager.table_name, owManager.db_name, "data")
-        csv_handler = csvHandler(file_full_paht)
+        file_full_path = ServerTools.get_file_full_path(RowManager.table_name, RowManager.db_name, "data")
+        csv_handler = csvHandler(file_full_path)
         data = csv_handler.get_content()
-        data.append(RowManager.content)
+        data.extend(RowManager.content)
         csv_handler.set_content(data)
-
-    ########## Get: Private ##########
-        @saticmethod
