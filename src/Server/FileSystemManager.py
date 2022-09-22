@@ -39,15 +39,18 @@ class FileSystemManager:
 
     @staticmethod
     def drop_table(db_name, data):
+        print(db_name)
+        print(data)
         TableManager.drop_table(db_name, data)
 
 ####### Row #####
 
     @staticmethod
     def insert_into(db_name, data):
-        print (db_name)
-        print(data)
-        RowManager.insert_table(db_name, "customers", data)
+        RowManager.insert_table(db_name, data["NAME"], data["DATA"])
 
-        #RowManager.insert_table(db_name, data["NAME"], data["DATA"])
+
+
+
+
 
