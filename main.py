@@ -11,9 +11,11 @@ def main():
         if (command in ["exit", "quit", "\q", "exit;", "quit;", "\q;"]):
             print("Bye")
             break
-        parsingTree = Parser.parser(command)
-        # print("END RESULT:", parsingTree)
-        Interpreter.execute(parsingTree)
+        try:
+            parsingTree = Parser.parser(command)
+            Interpreter.execute(parsingTree)
+        except Exception as e:
+            print(f"Error: {e}")
 
 
 if __name__ == "__main__":
