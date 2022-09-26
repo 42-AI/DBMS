@@ -48,9 +48,3 @@ class FileSystemManager:
     @staticmethod
     def insert_into(db_name, data):
         RowManager.insert_table(db_name, data["NAME"], data["DATA"])
-
-
-
-
-
-
