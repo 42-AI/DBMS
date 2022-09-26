@@ -18,6 +18,7 @@ class Interpreter:
             "CREATE DATABASE": lambda node: fsm.create_db(node.data),
             "SHOW DATABASES": lambda node: Show.databases(),
             "SHOW TABLES": lambda node: Show.tables(DatabaseName.db_name),
+            "INSERT INTO": lambda node: fsm.insert_into(DatabaseName.db_name, node.data),
         }
         while parsingTree:
             # print(f"{colors.WARNING}DATABASE NAME: {DatabaseName.db_name}{colors.ENDC}")
