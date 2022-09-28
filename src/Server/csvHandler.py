@@ -35,6 +35,8 @@ class csvHandler:
                 self._content = self._get_content(raw_data)
             else:
                 self._content = []
+        else:
+            raise Exeption("Error Database")
 
     def _get_content(self, raw_content):
         content = []
@@ -56,6 +58,9 @@ class csvHandler:
         data += self._separator.join(str(x) for x in self._header) + '\n'
         for array_line in self._content:
             str_line = ''
+            for insert_field in array_line.keys():
+                if insert_field not in self._header.keys():
+                    raise Exeption(insert_field + " is not a Field of the table")
             for field in self._header:
                 if field in array_line.keys():
                     str_line += str(array_line[field])
