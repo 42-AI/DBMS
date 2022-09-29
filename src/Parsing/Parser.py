@@ -1,6 +1,4 @@
 from configparser import ParsingError
-from lib2to3.pgen2.parse import ParseError
-import sys
 from src.Parsing.Constants import precedences, keywords_list, data_types
 from src.Parsing.ParsingNode import Node
 
@@ -17,6 +15,7 @@ def add_to_parsing_tree(parsingTree, new_node):
 
 
 class Parser:
+    SyntaxErrorTxt = "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near "
     keyword_functions = {
         # "SELECT": lambda input_tokens, keyword: Parser.select_parser(input_tokens, keyword),
         "CREATE TABLE": lambda input_tokens, keyword: Parser.create_table_parser(input_tokens, keyword),
@@ -63,6 +62,7 @@ class Parser:
                 word = ""
             else:
                 raise ParsingError(f"Error: Character {inst[i]} not recognized")
+        # print(result)
         return result
 
     @staticmethod
@@ -77,7 +77,7 @@ class Parser:
                     elem_type = "keyword"
                 elif elem.upper() in precedences.keys():
                     elem_type = "operator"
-                elif len(elem) == 1 and elem[0] in "()[]\{\}\t\n\r ,":
+                elif len(elem) == 1 and elem[0] in "()[]{}\t\n\r ,":
                     elem_type = "separator"
                 elif elem.upper() in data_types.keys():
                     elem_type = "datatype"
@@ -122,24 +122,24 @@ class Parser:
                     description["KEY"] = 'PRI'
                     i_t = i_t[1:]
                 else:
-                    raise ParseError("Error while filling Description")
+                    raise ParsingError("Error while filling Description")
             elif i_t[0][1].upper() == "NOT" and len(i_t) > 2 and i_t[1][1].upper() == "NULL":
                 description["NULL"] = False
                 i_t = i_t[1:]
             i_t = i_t[1:]
         if i_t[0][0] != "separator":
-            raise ParseError(f"ERROR {i_t[0][1]} is not a separator")
+            raise ParsingError(f"ERROR {i_t[0][1]} is not a separator")
         data["DESCRIPTION"].append(description)
         if i_t[0][1] == ",":
             i_t = i_t[1:]
         elif i_t[0][1] != ")":
-            raise ParseError(f"ERROR {i_t[0][1]} is not a valid separator")
+            raise ParsingError(f"ERROR {i_t[0][1]} is not a valid separator")
         return i_t, data
 
     @staticmethod
     def create_table_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
-            return None, None
+            raise ParsingError(f"{Parser.SyntaxErrorTxt}'{input_tokens[0][1]}'")
         data = {
             "NAME": input_tokens[0][1],
             "DESCRIPTION": []
@@ -201,7 +201,7 @@ class Parser:
     @staticmethod
     def insert_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
-            return None, None
+            raise ParsingError(f"{Parser.SyntaxErrorTxt}'{input_tokens[0][1]}'")
         data = {
             "NAME": input_tokens[0][1],
             "DATA": []
@@ -215,10 +215,10 @@ class Parser:
     @staticmethod
     def simple_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
-            return
-        db_name = input_tokens[0][1]
+            raise ParsingError(f"{Parser.SyntaxErrorTxt}'{input_tokens[0][1]}'")
+        name = input_tokens[0][1]
         input_tokens = input_tokens[1:]
-        return input_tokens, Node(keyword=keyword, data=db_name)
+        return input_tokens, Node(keyword=keyword, data=name)
 
     @staticmethod
     def drop_table_parser(input_tokens, keyword):
