@@ -77,7 +77,7 @@ class Parser:
                     elem_type = "keyword"
                 elif elem.upper() in precedences.keys():
                     elem_type = "operator"
-                elif len(elem) == 1 and elem[0] in "()[]\{\}\t\n\r ,":
+                elif len(elem) == 1 and elem[0] in "()[]{}\t\n\r ,":
                     elem_type = "separator"
                 elif elem.upper() in data_types.keys():
                     elem_type = "datatype"
