@@ -2,8 +2,9 @@ import os.path as path
 import os, sys
 import src.Server.ServerTools as Tools
 from src.Server.ServerTools import ServerTools
+from src.ErrorMessages import ErrorMessages
 import shutil
-
+import FileExistsError
 
 class DatabaseManager:
 
@@ -12,19 +13,16 @@ class DatabaseManager:
         DatabaseManager._create_main_directory()
         db_full_path = path.join(Tools.MAIN_PATH, db_name)
         if path.isdir(path.expanduser(db_full_path)):
-            print(f"Error: database {db_name} already exists.", file=sys.stderr)
-            return
+            raise FileExistsError(ErrorMessages.DB_ALREADY_EXIST)
         os.mkdir(path.expanduser(db_full_path))
 
     @staticmethod
     def drop_db_dir(db_name: str):
         db_dir_full_path = ServerTools.get_db_dir_full_path(db_name)
         if not db_dir_full_path:
-            print("no valid DB used")
-            return
+            raise FileNotFoundError(ErrorMessages.DB_DOES_NOT_EXIST)
         if not path.isdir(db_dir_full_path):
-            print(f"Error: database {db_name} doesn't exists.", file=sys.stderr)
-            return
+            raise FileNotFoundError(ErrorMessages.DB_DOES_NOT_EXIST)
         shutil.rmtree(db_dir_full_path)
 
     @staticmethod
