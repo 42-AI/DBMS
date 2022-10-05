@@ -21,6 +21,10 @@ class ServerTools:
         return path.join(ServerTools.get_db_dir_full_path(_db_dir), _table_dir)
 
     @staticmethod
+    def get_main_path():
+        return MAIN_PATH
+
+    @staticmethod
     def get_file_full_path(_table_dir: str, _db_dir: str, file_type:str):
         file_name = file_type + ".csv"
         if not _db_dir:
