@@ -1,4 +1,6 @@
 from src.Server.FileSystemManager import FileSystemManager as fsm
+from src.Server.DatabaseManager import DatabaseManager
+from src.ErrorMessages import ErrorMessages
 from src.Show import Show
 import sys
 from src.utils import colors
@@ -23,6 +25,8 @@ class Interpreter:
         while parsingTree:
             # print(f"{colors.WARNING}DATABASE NAME: {DatabaseName.db_name}{colors.ENDC}")
             if parsingTree.keyword.upper() == "USE":
+                if parsingTree.data not in DatabaseManager.get_dbs():
+                    raise Exception(ErrorMessages.DB_DOES_NOT_EXIST)
                 DatabaseName.db_name = parsingTree.data
             elif parsingTree.keyword.upper() in keyword_functions.keys():
                 keyword_functions[parsingTree.keyword.upper()](parsingTree)
