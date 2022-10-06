@@ -22,7 +22,7 @@ class Interpreter:
         }
         while parsingTree:
             # print(f"{colors.WARNING}DATABASE NAME: {DatabaseName.db_name}{colors.ENDC}")
-            if parsingTree.keyword == "USE":
+            if parsingTree.keyword.upper() == "USE":
                 DatabaseName.db_name = parsingTree.data
             elif parsingTree.keyword.upper() in keyword_functions.keys():
                 keyword_functions[parsingTree.keyword.upper()](parsingTree)
