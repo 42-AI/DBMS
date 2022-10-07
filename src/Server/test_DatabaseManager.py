@@ -8,6 +8,13 @@ import pytest
 
 class TestDatabaseManager:
 
+    @classmethod
+    def setup_class(self):
+        shutil.rmtree(Tools.get_main_path(), ignore_errors=True)
+
+    @classmethod
+    def teardown_class(self):
+        shutil.rmtree(Tools.get_main_path(), ignore_errors=True)
 
     @pytest.mark.parametrize("db_name", ["database_test"])
     # create a db
