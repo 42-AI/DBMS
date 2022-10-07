@@ -6,6 +6,9 @@ from src.ErrorMessages import ErrorMessages
 
 class TestFileSystemManager:
 
+    def setup_class(self):
+        shutil.rmtree(Tools.get_main_path(), ignore_errors=True)
+
     def test_create_table_without_db(self):
         with pytest.raises(Exception) as excinfo:
             fsm.create_table(None, {"test": "test"})
