@@ -23,6 +23,11 @@ class TestInterpreter:
         Interpreter.execute(Node(keyword="USE", data=db_name))
         assert DatabaseName.db_name == db_name
 
+    @pytest.mark.parametrize("db_name", ["database_prim"])
+    def test_use_lowcase(self, db_name):
+        DatabaseManager.create_db_dir(db_name)
+        Interpreter.execute(Node(keyword="use", data=db_name))
+        assert DatabaseName.db_name == db_name
 
     @pytest.mark.parametrize("db_name", ["void"])
     def test_use_unexistent_db(self, db_name):
