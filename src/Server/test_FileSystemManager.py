@@ -1,10 +1,15 @@
 import pytest
 from src.Server.FileSystemManager import FileSystemManager as fsm
 from src.ErrorMessages import ErrorMessages
+import src.Server.ServerTools as Tools
+import shutil
 
 
 
 class TestFileSystemManager:
+
+    def setup_class(self):
+        shutil.rmtree(Tools.get_main_path(), ignore_errors=True)
 
     def test_create_table_without_db(self):
         with pytest.raises(Exception) as excinfo:

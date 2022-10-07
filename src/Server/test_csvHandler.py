@@ -24,6 +24,10 @@ from tests.resources.write_test_csv.write.write_expectation import write_test_ar
 
 class TestCsvHandler:
 
+    @classmethod
+    def teardown_class(self):
+        shutil.rmtree(WRITE_TMP, ignore_errors=True)
+
     @pytest.mark.parametrize("file_name, expected_array", empty_test_array)
     def test_read_empty_csv(self, file_name, expected_array):
         file_path = EMPTY_DIR + file_name
