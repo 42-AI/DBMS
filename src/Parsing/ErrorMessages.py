@@ -1,0 +1,2 @@
+class ErrorMessages:
+    pass
