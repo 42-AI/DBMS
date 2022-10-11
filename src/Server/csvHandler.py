@@ -3,11 +3,18 @@ from get_project_root import root_path
 
 class csvHandler:
 
-    def __init__(self, file_full_path, separator=','):
+    def __init__(self, file_full_path, separator=',', header=[], content=[]):
         #self._file_path_is_valide(file_full_path)  # raise exception
         self._separator = separator
         self._file_full_path = file_full_path
-        self._get_data_from_file()
+        if header.size == 0:
+            self._get_header_from_file()
+        else:
+            self._header = header
+        if content.size == 0:
+            self._get_content_from_file()
+        else:
+            self._content = content
 
     def __del__(self):
         self._store_data_in_file()
@@ -24,17 +31,26 @@ class csvHandler:
 
     ################# Private: Get ####################
 
-    def _get_data_from_file(self):
+    def _get_row_data(self):
         with open(self._file_full_path, "r") as file:
-            raw_data = file.readlines()
+            self.raw_data = file.readlines()
             file.close()
-        if len(raw_data) > 0:
+
+    def _get_header_from_file(self):
+        if len(self.raw_data) == 0:
+            self._get_row_data()
+        if len(self.raw_data) > 0:
             self._header = raw_data[0].replace('\n', '').split(self._separator)
-            if len(raw_data) > 1:
-                raw_data.pop(0)
-                self._content = self._get_content(raw_data)
-            else:
-                self._content = []
+
+    def _get_content_from_file(self):
+        if len(self.raw_data) == 0:
+            self._get_row_data()
+        raw_data = self.raw_data
+        if len(raw_data) > 1:
+            raw_data.pop(0)
+            self._content = self._get_content(raw_data)
+        else:
+            self._content = []
 
     def _get_content(self, raw_content):
         content = []
