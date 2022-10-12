@@ -3,15 +3,16 @@ from get_project_root import root_path
 
 class csvHandler:
 
-    def __init__(self, file_full_path, separator=',', header=[], content=[]):
+    def __init__(self, file_full_path, separator=',', header=None, content=None):
         #self._file_path_is_valide(file_full_path)  # raise exception
+        self.raw_data = ""
         self._separator = separator
         self._file_full_path = file_full_path
-        if header.size == 0:
+        if header is None:
             self._get_header_from_file()
         else:
             self._header = header
-        if content.size == 0:
+        if content is None:
             self._get_content_from_file()
         else:
             self._content = content
