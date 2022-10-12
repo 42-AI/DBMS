@@ -1,4 +1,6 @@
 from src.Server.ServerTools import ServerTools
+from src.Server.csvHandler import csvHandler
+from src.ErrorMessages import ErrorMessages
 import src.Server.ServerTools as Tools
 import os.path as path
 import os, sys
@@ -43,27 +45,24 @@ class TableManager:
     def _create_table_file():
         table_fields = TableManager._get_table_fields();
         file_type = "data"
-        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, table_fields)
+        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, table_fields, [])
 
     @staticmethod
     def _create_meta_table_file():
         meta_description = TableManager._get_meta_description()
-        meta_content = TableManager._get_meta_content()
+        meta_content = TableManager.table_description
         file_type = "meta"
-        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, f"{meta_description}\n{meta_content}")
+        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, meta_description, meta_content)
 
     @staticmethod
-    def _create_file(table_name: str, dir_name: str, file_type: str, file_content: str):
+    def _create_file(table_name: str, dir_name: str, file_type: str, header, content: str):
         file_full_path = ServerTools.get_file_full_path(table_name, dir_name, file_type)
         if path.exists(file_full_path):
-            print(f"Error: table {file_name} already exists.", file=sys.stderr)
-            return
+            raise Exception(ErrorMessages.TABLE_ALREADY_EXIST)
         if not path.isdir(path.expanduser(ServerTools.get_db_dir_full_path(dir_name))):
-            print(f"Error: database {dir_name} doesn't exists.", file=sys.stderr)
-            return
-        f = open(file_full_path, "x")
-        f.write(file_content)
-        f.close()
+            raise Exception(ErrorMessages.DB_DOES_NOT_EXIST)
+        csv_handler = csvHandler(file_full_path, header=header, content=content)
+        csv_handler.__del__()
         return file_full_path
 
     @staticmethod
@@ -76,24 +75,14 @@ class TableManager:
 
     @staticmethod
     def _get_table_fields():
-        fields = ''
+        fields = []
         for field in TableManager.table_description:
-            fields += field["FIELD"] + ","
-        return fields[:-1] + '\n'
+            fields.append(field["FIELD"])
+        return fields
 
     @staticmethod
     def _get_meta_description():
-        return ",".join(str(key) for key in TableManager.table_description[0].keys())
-
-    @staticmethod
-    def _get_meta_content():
-        meta_content = ''
-        for field in TableManager.table_description:
-            field_meta = ''
-            for meta_field in TableManager.meta_description:
-                field_meta += str(field[meta_field]) + ','
-            meta_content += str(field_meta[:-1]) + '\n'
-        return meta_content[:-1]
+        return TableManager.table_description[0].keys()
 
     @staticmethod
     def _get_tables_array():

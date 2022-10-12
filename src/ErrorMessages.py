@@ -8,3 +8,6 @@ class ErrorMessages:
     #### FileSystemManager ####
     NO_DB_SELECTED = "Error no database is selected"
     NO_TABLE_SELECTED = "Error no table is selected"
+
+    #### Tables ####
+    TABLE_ALREADY_EXIST = "Error Table already exist"
