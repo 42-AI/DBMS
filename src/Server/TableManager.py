@@ -49,7 +49,7 @@ class TableManager:
 
     @staticmethod
     def _create_meta_table_file():
-        meta_description = TableManager.table_description[0].keys()
+        meta_description = TableManager._get_meta_description()
         meta_content = TableManager.table_description
         file_type = "meta"
         return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, meta_description, meta_content)
