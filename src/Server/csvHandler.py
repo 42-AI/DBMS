@@ -41,7 +41,7 @@ class csvHandler:
         if len(self.raw_data) == 0:
             self._get_row_data()
         if len(self.raw_data) > 0:
-            self._header = raw_data[0].replace('\n', '').split(self._separator)
+            self._header = self.raw_data[0].replace('\n', '').split(self._separator)
 
     def _get_content_from_file(self):
         if len(self.raw_data) == 0:
