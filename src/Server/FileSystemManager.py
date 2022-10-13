@@ -43,6 +43,12 @@ class FileSystemManager:
             raise Exception(ErrorMessages.NO_DB_SELECTED)
         TableManager.drop_table(db_name, table_name)
 
+    @staticmethod
+    def describe_table(db_name, table_name):
+        if db_name is None:
+            raise Exception(ErrorMessages.NO_DB_SELECTED)
+            TableManager.describe_table(db_name, table_name)
+
 ####### Row #####
 
     @staticmethod

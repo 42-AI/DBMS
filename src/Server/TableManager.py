@@ -38,7 +38,12 @@ class TableManager:
         TableManager.db_name = db_name
         return TableManager._get_tables_array()
 
-
+    @staticmethod
+    def describe_table(db_name: str, table_name: str):
+        TableManager.db_name = db_name
+        TableManager.table_name = table_name
+        file_type = "meta"
+        return TableManager._get_table(file_type)
 
     ######### Creation: Private ########
     @staticmethod
@@ -94,6 +99,17 @@ class TableManager:
 #            return
         tables = os.listdir(ServerTools.get_db_dir_full_path(TableManager.db_name))
         return tables
+
+    @staticmethod
+    def _get_tables_array(file_type):
+        file_full_path = ServerTools.get_file_full_path(TableManager.table_name, TableManager.db_name, file_type)
+        if not path.isdir(path.expanduser(ServerTools.get_db_dir_full_path(TableManager.db_name))):
+            raise Exception(ErrorMessages.DB_DOES_NOT_EXIST)
+        if not path.exists(file_full_path):
+            raise Exception(ErrorMessages.TABLE_ALREADY_EXIST)
+        csv_handler = csvHandler(file_full_path)
+        return csv_handler.get_content()
+
 
     ######### Delete: Private ########
 
