@@ -45,18 +45,20 @@ class TableManager:
     def _create_table_file():
         table_fields = TableManager._get_table_fields();
         file_type = "data"
-        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, table_fields, [])
+        return TableManager._create_file(file_type, table_fields, [])
 
     @staticmethod
     def _create_meta_table_file():
         meta_description = TableManager._get_meta_description()
         meta_content = TableManager.table_description
         file_type = "meta"
-        return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, meta_description, meta_content)
+        return TableManager._create_file(file_type, meta_description, meta_content)
 
     @staticmethod
-    def _create_file(table_name: str, dir_name: str, file_type: str, header, content: str):
-        file_full_path = ServerTools.get_file_full_path(table_name, dir_name, file_type)
+    def _create_file(file_type: str, header, content: str):
+        file_full_path = ServerTools.get_file_full_path(TableManager.table_name, TableManager.db_name, file_type)
+        if not path.isdir(path.expanduser(ServerTools.get_db_dir_full_path(TableManager.db_name))):
+            raise Exception(ErrorMessages.DB_DOES_NOT_EXIST)
         if path.exists(file_full_path):
             raise Exception(ErrorMessages.TABLE_ALREADY_EXIST)
         if not path.isdir(path.expanduser(ServerTools.get_db_dir_full_path(dir_name))):
