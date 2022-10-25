@@ -246,13 +246,13 @@ class Parser:
 
     @staticmethod
     def pretty_print(txt, array):
-        print("========================")
-        print(txt)
+        print("========================", file=sys.stderr)
+        print(txt, file=sys.stderr)
         for index, line in enumerate(array):
-            print(f"Line {index}:")
+            print(f"Line {index}:", file=sys.stderr)
             for elem in line:
-                print(elem)
-        print("========================")
+                print(elem, file=sys.stderr)
+        print("========================", file=sys.stderr)
 
     @staticmethod
     def concat_keywords(input_tokens):
@@ -266,10 +266,10 @@ class Parser:
 
     @staticmethod
     def print_node(node):
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        print("KEYWORD:", node.keyword)
-        print("DATA:", node.data)
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^", file=sys.stderr)
+        print("KEYWORD:", node.keyword, file=sys.stderr)
+        print("DATA:", node.data, file=sys.stderr)
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^", file=sys.stderr)
 
     @staticmethod
     def parser(txt):
