@@ -38,9 +38,8 @@ class RowManager:
 
     ########## Insert: Private #######
     @staticmethod
-    def appendLine():
-        file_full_path = ServerTools.get_file_full_path(RowManager.table_name, RowManager.db_name, "data")
-        csv_handler = csvHandler(file_full_path)
+    def _appendLine():
+        csv_handler = RowManager._getCsvHandler()
         data = csv_handler.get_content()
         data.extend(RowManager.content)
         csv_handler.set_content(data)
