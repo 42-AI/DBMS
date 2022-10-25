@@ -52,14 +52,14 @@ class TableManager:
             RowManager.delete_table(db_name, table_name, command, file_type=file_type)
             RowManager.delete_item(db_name, table_name, field_name)
         elif modify:
-            
+            RowManager.modify_table(db_name, table_name, command, file_type=file_type)
 
 
 
     ######### Creation: Private ########
     @staticmethod
     def _create_table_file():
-        table_fields = TableManager._get_table_fields();
+        table_fields = TableManager._get_table_fields()
         file_type = "data"
         return TableManager._create_file(TableManager.table_name, TableManager.db_name, file_type, table_fields, [])
 

@@ -42,17 +42,18 @@ class RowManager:
         RowManager._remove_item(item)
 
     ######## Update: Public #########
-    @staticmethodc
-    def modify_table(db_name: str, table_name: str, conditional_func, file_type="data"):
+    @staticmethod
+    def modify_table(db_name: str, table_name: str, command, file_type="data"):
         RowManager.db_name = db_name
         RowManager.table_name = table_name
         RowManager.file_type = file_type
         conditional_func = command  # TODO method to convert command to function
-        RowManager._modifyLine(conditional_func)
+        modifier, modifier_func = command # TODO method to convert command to function
+        RowManager._modifyLine(conditional_func, modifier_func)
 
     ########## Insert: Private #######
     @staticmethod
-    def _appendLine():
+    def _append_line():
         csv_handler = RowManager._getCsvHandler()
         data = csv_handler.get_content()
         data.extend(RowManager.content)
@@ -87,8 +88,16 @@ class RowManager:
 
     ######## Update: Public #########
     @staticmethod
-    def _modifyLine(conditional_func, replacement_func):
+    def _modifyLine(conditional_func, modifier_func):
+        csv_handler = RowManager._getCsvHandler()
+        data = csv_handler.get_content()
+        for row in data:
+            if conditional_func(row):
+                index = data.index(row)
+                data[index] = modifier_func(row)
 
+        csv_handler.set_content(data)
+        csv_handler.__del__()
 
     ######## Get: Private #######
     @staticmethod
