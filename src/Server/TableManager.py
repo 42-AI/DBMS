@@ -39,6 +39,18 @@ class TableManager:
         TableManager.db_name = db_name
         return TableManager._get_tables_array()
 
+    ######### Update: Public #########
+
+    @staticmethod
+    def alter_table(db_name: str, table_name: str, command: str):
+        file_type = "meta"
+        if add :
+            RowManager.insert_table(db_name, table_name, command, file_type=file_type)
+        elif drop:
+            RowManager.delete_table(db_name, table_name, command, file_type=file_type)
+        elif modify:
+            
+
 
 
     ######### Creation: Private ########
