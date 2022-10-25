@@ -30,6 +30,7 @@ class DatabaseManager:
         if Tools.MAIN_PATH_NAME not in dir_list:
             raise Exception(ErrorMessages.NO_DBS_DIR)
         elements = os.listdir(Tools.MAIN_PATH)
+        elements.sort()
         return elements
 
     @staticmethod
