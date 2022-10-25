@@ -44,8 +44,10 @@ class TableManager:
     @staticmethod
     def alter_table(db_name: str, table_name: str, command: str):
         file_type = "meta"
+        field_name = command #TODO: extract field name from command
         if add :
             RowManager.insert_table(db_name, table_name, command, file_type=file_type)
+            RowManager.add_item(db_name, field_name, command)
         elif drop:
             RowManager.delete_table(db_name, table_name, command, file_type=file_type)
         elif modify:

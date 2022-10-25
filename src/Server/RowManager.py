@@ -16,7 +16,14 @@ class RowManager:
         RowManager.table_name = table_name
         RowManager.content = content
         RowManager.file_type = file_type
-        RowManager._appendLine()
+        RowManager._append_line()
+
+    @staticmethod
+    def add_item(db_name: str, table_name: str, data, file_type="data"):
+        RowManager.db_name = db_name
+        RowManager.table_name = table_name
+        RowManager.file_type = file_type
+        RowManager._add_item(data["item"], data["default_value"])
 
     ######### Delete: Public ########
     @staticmethodc
@@ -43,6 +50,14 @@ class RowManager:
         data = csv_handler.get_content()
         data.extend(RowManager.content)
         csv_handler.set_content(data)
+
+    @staticmethod
+    def _add_item(item, default_value=""):
+        csv_handler = RowManager._getCsvHandler()
+        data = csv_handler.get_content()
+        list(map(lambda x: x.update({item, default_value}), data))
+        csv_handler.set_content(data)
+        csv_handler.__del__()
 
     ######## Delete: Private
     @staticmethod
