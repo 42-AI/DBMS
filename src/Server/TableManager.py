@@ -1,4 +1,5 @@
 from src.Server.ServerTools import ServerTools
+from src.Server.RowManager import RowManager
 from src.Server.csvHandler import csvHandler
 from src.ErrorMessages import ErrorMessages
 import src.Server.ServerTools as Tools
@@ -59,8 +60,6 @@ class TableManager:
         file_full_path = ServerTools.get_file_full_path(table_name, dir_name, file_type)
         if path.exists(file_full_path):
             raise Exception(ErrorMessages.TABLE_ALREADY_EXIST)
-        if not path.isdir(path.expanduser(ServerTools.get_db_dir_full_path(dir_name))):
-            raise Exception(ErrorMessages.DB_DOES_NOT_EXIST)
         csv_handler = csvHandler(file_full_path, header=header, content=content)
         csv_handler.__del__()
         return file_full_path
