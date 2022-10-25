@@ -50,6 +50,7 @@ class TableManager:
             RowManager.add_item(db_name, field_name, command)
         elif drop:
             RowManager.delete_table(db_name, table_name, command, file_type=file_type)
+            RowManager.delete_item(db_name, table_name, field_name)
         elif modify:
             
 

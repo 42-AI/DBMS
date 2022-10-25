@@ -26,13 +26,20 @@ class RowManager:
         RowManager._add_item(data["item"], data["default_value"])
 
     ######### Delete: Public ########
-    @staticmethodc
+    @staticmethod
     def delete_table(db_name: str, table_name: str, command, file_type="data"):
         RowManager.db_name = db_name
         RowManager.table_name = table_name
         RowManager.file_type = file_type
-        conditional_func, replacement_func = command #TODO method to convert command to functions
-        RowManager._removeLines(conditional_func, replacement_func)
+        conditional_func = command #TODO method to convert command to functions
+        RowManager._remove_lines(conditional_func)
+
+    @staticmethod
+    def delete_item(db_name: str, table_name: str, item, file_type="data"):
+        RowManager.db_name = db_name
+        RowManager.table_name = table_name
+        RowManager.file_type = file_type
+        RowManager._remove_item(item)
 
     ######## Update: Public #########
     @staticmethodc
@@ -61,12 +68,20 @@ class RowManager:
 
     ######## Delete: Private
     @staticmethod
-    def _removeLines(conditional_func):
+    def _remove_lines(conditional_func):
         csv_handler = RowManager._getCsvHandler()
         data = csv_handler.get_content()
         for row in data:
             if conditional_func(row):
-                data.remove(data)
+                data.remove(row)
+        csv_handler.set_content(data)
+        csv_handler.__del__()
+
+    @staticmethod
+    def _remove_item(item):
+        csv_handler = RowManager._getCsvHandler()
+        data = csv_handler.get_content()
+        list(map(lambda x: x.pop(item), data))
         csv_handler.set_content(data)
         csv_handler.__del__()
 
