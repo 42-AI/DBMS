@@ -1,5 +1,4 @@
 from configparser import ParsingError
-from msilib.schema import Error
 from src.Parsing.Constants import precedences, keywords_list, data_types
 from src.Parsing.ParsingNode import Node
 from src.ErrorMessages import ErrorMessages
