@@ -2,6 +2,7 @@ from src.Parsing import Parser
 from src.Parsing.ParsingNode import Node
 from src.Parsing.test_resources.CreateTestData import CreateTestData
 from src.Parsing.test_resources.InsertTestData import InsertTestData
+from src.ErrorMessages import ErrorMessages
 import pytest
 
 
@@ -55,7 +56,7 @@ def test_split_instruction_error(entry, expected):
         [[], Node(keyword="use", data="demo")]
     ),
 ])
-def test_split_instruction_valid(entry, expected):
+def test_simple_parser_valid(entry, expected):
     i_t, node = Parser.simple_parser(*entry)
     assert i_t == expected[0]
     assert node.keyword == expected[1].keyword
@@ -67,8 +68,7 @@ def test_split_instruction_valid(entry, expected):
         [[], Node(keyword="use", data="demo")]
     ),
 ])
-def test_split_instruction_error(entry, expected):
-    i_t, node = Parser.simple_parser(*entry)
-    assert i_t == expected[0]
-    assert node.keyword == expected[1].keyword
-    assert node.data == expected[1].data
+def test_simple_parser_error(entry, expected):
+    ErrorMsg = Parser.simple_parser(*entry)
+    e = ErrorMessages.PARSING_SYNTAX
+    assert ErrorMsg[0:len(e)] == e
