@@ -10,7 +10,7 @@ VALUES
 ```python
 keyword = "INSERT INTO",
 data = {
-    'NAME': 'CUSTOMERS',
+    'NAME': 'customers',
     'DATA': [
         {
             'first_name': 'Rébecca',
