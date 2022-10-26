@@ -1,3 +1,4 @@
+from configparser import ParsingError
 from src.Parsing import Parser
 from src.Parsing.ParsingNode import Node
 from src.Parsing.test_resources.CreateTestData import CreateTestData
@@ -69,6 +70,7 @@ def test_simple_parser_valid(entry, expected):
     ),
 ])
 def test_simple_parser_error(entry, expected):
-    ErrorMsg = Parser.simple_parser(*entry)
-    e = ErrorMessages.PARSING_SYNTAX
-    assert ErrorMsg[0:len(e)] == e
+    try:
+        Parser.simple_parser(*entry)
+    except ParsingError as e:
+        assert ErrorMessages.PARSING_SYNTAX in e.message
