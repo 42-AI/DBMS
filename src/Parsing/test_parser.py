@@ -1,133 +1,76 @@
-import pytest
-import sys
-import os
-sys.path.append('../src')
+from configparser import ParsingError
 from src.Parsing import Parser
-
+from src.Parsing.ParsingNode import Node
+from src.Parsing.test_resources.CreateTestData import CreateTestData
+from src.Parsing.test_resources.InsertTestData import InsertTestData
+from src.ErrorMessages import ErrorMessages
+import pytest
 
 
 #################### test_get_input_tokens_list TESTS ####################
 @pytest.mark.parametrize("entry,expected", [
-    ("", []),
+    (
+        CreateTestData.get_input_token_list_entry,
+        CreateTestData.get_input_token_list_expected
+    ),
+    (
+        InsertTestData.get_input_token_list_entry,
+        InsertTestData.get_input_token_list_expected
+    ),
 ])
 def test_get_input_tokens_list_valid(entry, expected):
     assert Parser.get_input_tokens_list(entry) == expected
 
-# @pytest.mark.parametrize("entry,expected", [
-#     ("", None),
-# ])
-# def test_get_input_tokens_list_error(entry, expected):
-#     assert Parser.get_input_tokens_list(entry) == expected
+@pytest.mark.parametrize("entry,expected", [
+    ("", []),
+])
+def test_get_input_tokens_list_error(entry, expected):
+    assert Parser.get_input_tokens_list(entry) == expected
 
 
-#################### SELECT TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([['A', ',', 'B', ',', 'C', 'FROM', 'TEST'], "SELECT", None, []], (['FROM', 'TEST'], "SELECT", None, ['A', 'B', 'C'])),
-#     ([['*', 'FROM', 'TEST'], "SELECT", None, []], (['FROM', 'TEST'], "SELECT", None, ['*'])),
-# ])
-# def test_select_parser_valid(entry, expected):
-#     assert Parser.select_parser(*entry) == expected
+#################### split_instructions TESTS ############################
+@pytest.mark.parametrize("entry,expected", [
+    (
+        CreateTestData.split_instruction_entry,
+        CreateTestData.split_instruction_expected
+        
+    ),
+    (
+        InsertTestData.split_instruction_entry,
+        InsertTestData.split_instruction_expected
+    ),
+])
+def test_split_instruction_valid(entry, expected):
+    assert Parser.split_instruction(entry) == expected
 
-# @pytest.mark.parametrize("entry,expected", [
-#     ([['A', 'B', 'C', 'FROM', 'TEST'], "SELECT", None, []], None),
-# ])
-# def test_select_parser_error(entry, expected):
-#     assert Parser.select_parser(*entry) == expected
-
-
-#################### FROM TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_from_parser_valid(entry, expected):
-#     assert Parser.from_parser(*entry) == expected
-
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_from_parser_error(entry, expected):
-#     assert Parser.from_parser(*entry) == expected
+@pytest.mark.parametrize("entry,expected", [
+    ("", []),
+])
+def test_split_instruction_error(entry, expected):
+    assert Parser.split_instruction(entry) == expected
 
 
-#################### WHERE TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_where_parser_valid(entry, expected):
-#     assert Parser.where_parser(*entry) == expected
+#################### simple_parser TESTS ############################
+@pytest.mark.parametrize("entry,expected", [
+    (
+        [[['variable', 'demo']], 'use'],
+        [[], Node(keyword="use", data="demo")]
+    ),
+])
+def test_simple_parser_valid(entry, expected):
+    i_t, node = Parser.simple_parser(*entry)
+    assert i_t == expected[0]
+    assert node.keyword == expected[1].keyword
+    assert node.data == expected[1].data
 
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_where_parser_error(entry, expected):
-#     assert Parser.where_parser(*entry) == expected
-
-
-#################### CREATE TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_create_parser_valid(entry, expected):
-#     assert Parser.create_parser(*entry) == expected
-
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_create_parser_error(entry, expected):
-#     assert Parser.create_parser(*entry) == expected
-
-
-#################### DROP TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_drop_parser_valid(entry, expected):
-#     assert Parser.drop_parser(*entry) == expected
-
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_drop_parser_error(entry, expected):
-#     assert Parser.drop_parser(*entry) == expected
-
-
-#################### INSERT TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_insert_parser_valid(entry, expected):
-#     assert Parser.insert_parser(*entry) == expected
-
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_insert_parser_error(entry, expected):
-#     assert Parser.insert_parser(*entry) == expected
-
-
-#################### USE TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_use_parser_valid(entry, expected):
-#     assert Parser.use_parser(*entry) == expected
-
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_use_parser_error(entry, expected):
-#     assert Parser.use_parser(*entry) == expected
-
-
-#################### SHOW TESTS ####################
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_show_parser_valid(entry, expected):
-#     assert Parser.show_parser(*entry) == expected
-
-# @pytest.mark.parametrize("entry,expected", [
-#     ([[''], None, None, []], None),
-# ])
-# def test_show_parser_error(entry, expected):
-#     assert Parser.show_parser(*entry) == expected
+@pytest.mark.parametrize("entry,expected", [
+    (
+        [[['not a variable', 'demo']], 'use'],
+        [[], Node(keyword="use", data="demo")]
+    ),
+])
+def test_simple_parser_error(entry, expected):
+    try:
+        Parser.simple_parser(*entry)
+    except ParsingError as e:
+        assert ErrorMessages.PARSING_SYNTAX in e.message
