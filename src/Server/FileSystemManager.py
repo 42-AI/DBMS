@@ -44,10 +44,10 @@ class FileSystemManager:
         TableManager.drop_table(db_name, table_name)
 
     @staticmethod
-    def alter_table(db_name, table_name, commande):
+    def alter_table(db_name, data):
         if db_name is None:
             raise Exception(ErrorMessages.NO_DB_SELECTED)
-        TableManager.alter_table(db_name, table_name, commande)
+        TableManager.alter_table(db_name, data["NAME"], data["DATA"])
 
 ####### Row #####
 
