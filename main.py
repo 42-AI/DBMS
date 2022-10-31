@@ -16,8 +16,12 @@ def handle_commande(command):
 
 def main():
     if select.select([sys.stdin, ], [], [], 0.0)[0]:
-        for command in sys.stdin:
-            handle_commande(command)
+        command = ""
+        for line in sys.stdin:
+            command += line
+            if ';' in command:
+                handle_commande(command)
+                command = ""
     else:
         while True:
             command = SQLprompt()

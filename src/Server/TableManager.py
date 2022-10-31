@@ -105,6 +105,7 @@ class TableManager:
 #            print(f"{colors.BOLD}Empty set{colors.ENDC}")
 #            return
         tables = os.listdir(ServerTools.get_db_dir_full_path(TableManager.db_name))
+        tables.sort()
         return tables
 
     ######### Delete: Private ########

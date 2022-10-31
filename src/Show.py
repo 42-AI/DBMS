@@ -11,7 +11,7 @@ class Show:
         for elem in lst:
             print(f"| {elem: <{max([m, len(title)])}} |")
         print(f"+{'-'* (max([m, len(title)]) + 2)}+")
-        print(f"{len(lst) + 4} rows in set\n")
+        print(f"{len(lst)} rows in set\n")
 
     @staticmethod
     def databases():

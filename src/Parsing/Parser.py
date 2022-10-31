@@ -1,8 +1,8 @@
 from configparser import ParsingError
-from lib2to3.pgen2.parse import ParseError
-import sys
 from src.Parsing.Constants import precedences, keywords_list, data_types
 from src.Parsing.ParsingNode import Node
+from src.ErrorMessages import ErrorMessages
+import sys
 
 
 def add_to_parsing_tree(parsingTree, new_node):
@@ -62,7 +62,7 @@ class Parser:
                 result.append(word)
                 word = ""
             else:
-                raise ParsingError(f"Error: Character {inst[i]} not recognized")
+                raise ParsingError(f"{inst[i]}{ErrorMessages.PARSING_CHAR_NOT_RECOGNIZED}")
         return result
 
     @staticmethod
@@ -122,24 +122,24 @@ class Parser:
                     description["KEY"] = 'PRI'
                     i_t = i_t[1:]
                 else:
-                    raise ParseError("Error while filling Description")
+                    raise ParsingError(ErrorMessages.PARSING_DESCRIPTION)
             elif i_t[0][1].upper() == "NOT" and len(i_t) > 2 and i_t[1][1].upper() == "NULL":
                 description["NULL"] = False
                 i_t = i_t[1:]
             i_t = i_t[1:]
         if i_t[0][0] != "separator":
-            raise ParseError(f"ERROR {i_t[0][1]} is not a separator")
+            raise ParsingError(f"{i_t[0][1]}{ErrorMessages.PARSING_SEPARATOR}")
         data["DESCRIPTION"].append(description)
         if i_t[0][1] == ",":
             i_t = i_t[1:]
         elif i_t[0][1] != ")":
-            raise ParseError(f"ERROR {i_t[0][1]} is not a valid separator")
+            raise ParsingError(f"ERROR {i_t[0][1]}{ErrorMessages.PARSING_SEPARATOR}")
         return i_t, data
 
     @staticmethod
     def create_table_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
-            return None, None
+            raise ParsingError(f"{ErrorMessages.PARSING_SYNTAX}'{input_tokens[0][1]}'")
         data = {
             "NAME": input_tokens[0][1],
             "DESCRIPTION": []
@@ -168,7 +168,7 @@ class Parser:
                 header.append(i_t[0][1])
             input_tokens = i_t[1:]
         if input_tokens[0][1].upper() != "VALUES":
-            raise ParsingError("Parsing Error: keyword VALUES missing")
+            raise ParsingError(ErrorMessages.PARSING_KEYWORD_VALUE_MISSING)
         else:
             input_tokens = input_tokens[1:]
         return header, input_tokens
@@ -186,7 +186,7 @@ class Parser:
             elif i_t and i_t[0][1] == ")":
                 # brackets_stack.append(i_t[0][1])
                 if len(tmp) != len(header):
-                    raise ParsingError(f"Header length different form line length.")
+                    raise ParsingError(ErrorMessages.PARSING_INSERT_DIFFERENT_LENGTH)
                 else:
                     dic = dict([(h, d) for h, d in zip(header, tmp)])
                     data["DATA"].append(dic)
@@ -201,7 +201,7 @@ class Parser:
     @staticmethod
     def insert_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
-            return None, None
+            raise ParsingError(f"{ErrorMessages.PARSING_SYNTAX}'{input_tokens[0][1]}'")
         data = {
             "NAME": input_tokens[0][1],
             "DATA": []
@@ -215,10 +215,10 @@ class Parser:
     @staticmethod
     def simple_parser(input_tokens, keyword):
         if input_tokens[0][0] != "variable":
-            return
-        db_name = input_tokens[0][1]
+            raise ParsingError(f"{ErrorMessages.PARSING_SYNTAX}'{input_tokens[0][1]}'")
+        name = input_tokens[0][1]
         input_tokens = input_tokens[1:]
-        return input_tokens, Node(keyword=keyword, data=db_name)
+        return input_tokens, Node(keyword=keyword, data=name)
 
     @staticmethod
     def drop_table_parser(input_tokens, keyword):
@@ -246,13 +246,13 @@ class Parser:
 
     @staticmethod
     def pretty_print(txt, array):
-        print("========================")
-        print(txt)
+        print("========================", file=sys.stderr)
+        print(txt, file=sys.stderr)
         for index, line in enumerate(array):
-            print(f"Line {index}:")
+            print(f"Line {index}:", file=sys.stderr)
             for elem in line:
-                print(elem)
-        print("========================")
+                print(elem, file=sys.stderr)
+        print("========================", file=sys.stderr)
 
     @staticmethod
     def concat_keywords(input_tokens):
@@ -266,10 +266,10 @@ class Parser:
 
     @staticmethod
     def print_node(node):
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        print("KEYWORD:", node.keyword)
-        print("DATA:", node.data)
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^", file=sys.stderr)
+        print("KEYWORD:", node.keyword, file=sys.stderr)
+        print("DATA:", node.data, file=sys.stderr)
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^", file=sys.stderr)
 
     @staticmethod
     def parser(txt):
@@ -286,5 +286,5 @@ class Parser:
                     Parser.print_node(new_node)
                     parsingTree = add_to_parsing_tree(parsingTree, new_node)
                 else:
-                    raise ParsingError("Error in Parser function")
+                    raise ParsingError(ErrorMessages.PARSING_ERROR)
         return parsingTree
