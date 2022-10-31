@@ -42,19 +42,27 @@ class TableManager:
     ######### Update: Public #########
 
     @staticmethod
-    def alter_table(db_name: str, table_name: str, command: str):
+    def alter_table(db_name: str, table_name: str, commands: str):
         file_type = "meta"
-        field_name = command #TODO: extract field name from command
-        if add :
-            RowManager.insert_table(db_name, table_name, command, file_type=file_type)
-            RowManager.add_item(db_name, field_name, command)
-        elif drop:
-            RowManager.delete_table(db_name, table_name, command, file_type=file_type)
-            RowManager.delete_item(db_name, table_name, field_name)
-        elif modify:
-            RowManager.modify_table(db_name, table_name, command, file_type=file_type)
-
-
+        for command in commands:
+            field_name = command #TODO: extract field name from command
+            if command["ACTION"] == "ADD":
+                RowManager.insert_table(db_name, table_name, command["VALUE"], file_type=file_type)
+                RowManager.add_item(db_name, table_name, command["VALUE"])
+            elif command["ACTION"] == "DROP":
+                field_name = command["VALUE"]["NAME"]
+                func = lambda x: x["FIELD"] == field_name
+                RowManager.delete_table(db_name, table_name, func, file_type=file_type)
+                RowManager.delete_item(db_name, table_name, field_name)
+            elif command["ACTION"] == "MODIFY":
+                conditional_func = lambda row: row["FIELD"] == command["VALUE"]["FIELD"]
+                modifier_func = lambda row: row = command["VALUE"]
+                RowManager.modify_table(db_name, table_name, conditional_func, modifier_func, file_type=file_type)
+            elif command["ACTION"] == "CHANGE":
+                conditional_func = lambda row: row["FIELD"] == command["VALUE"]["OLD_NAME"]
+                modifier_func = lambda row: row["FIELD"] = command["VALUE"]["NEW_NAME"]
+                RowManager.modify_table(db_name, table_name, conditional_func, modifier_func, file_type=file_type)
+                RowManager.change_row()
 
     ######### Creation: Private ########
     @staticmethod
